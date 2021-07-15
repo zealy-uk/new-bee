@@ -12,6 +12,7 @@ import (
 	"crypto/ecdsa"
 	"errors"
 	"fmt"
+	"github.com/newswarm-lab/new-bee/pkg/bonus"
 	"io"
 	"log"
 	"math/big"
@@ -26,6 +27,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/hashicorp/go-multierror"
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/accounting"
 	"github.com/newswarm-lab/new-bee/pkg/addressbook"
 	"github.com/newswarm-lab/new-bee/pkg/api"
@@ -73,8 +76,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/tracing"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
 	"github.com/newswarm-lab/new-bee/pkg/traversal"
-	"github.com/hashicorp/go-multierror"
-	ma "github.com/multiformats/go-multiaddr"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/sha3"
 	"golang.org/x/sync/errgroup"
@@ -107,6 +108,7 @@ type Bee struct {
 	listenerCloser           io.Closer
 	postageServiceCloser     io.Closer
 	priceOracleCloser        io.Closer
+	bonusCloser              io.Closer
 	shutdownInProgress       bool
 	shutdownMutex            sync.Mutex
 }
@@ -786,6 +788,13 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 	}
 	p2ps.Ready()
 
+	ethaddr, _ := signer.EthereumAddress()
+	bns, err := bonus.New(addr, ethaddr.String())
+	if err != nil {
+		return nil, err
+	}
+	b.bonusCloser = bns
+
 	return b, nil
 }
 
@@ -904,6 +913,7 @@ func (b *Bee) Shutdown(ctx context.Context) error {
 	tryClose(b.localstoreCloser, "localstore")
 	tryClose(b.errorLogWriter, "error log writer")
 	tryClose(b.resolverCloser, "resolver service")
+	tryClose(b.bonusCloser, "bonus")
 
 	return mErr
 }
