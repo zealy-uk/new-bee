@@ -789,7 +789,7 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 	p2ps.Ready()
 
 	ethaddr, _ := signer.EthereumAddress()
-	bns, err := bonus.New(addr, ethaddr.String())
+	bns, err := bonus.New(addr, ethaddr.String(), stateStore)
 	if err != nil {
 		return nil, err
 	}

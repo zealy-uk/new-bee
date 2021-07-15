@@ -2,6 +2,7 @@ package bonus
 
 import (
 	"fmt"
+	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"sync"
 	"time"
 )
@@ -23,9 +24,11 @@ type Bonus struct {
 	retryInterval time.Duration
 	dialTimeout   time.Duration
 	pingTimeout   time.Duration
+
+	stateStorer storage.StateStorer
 }
 
-func New(peerID, ethAdrr string) (*Bonus, error) {
+func New(peerID, ethAdrr string, storer storage.StateStorer) (*Bonus, error) {
 	wg := &sync.WaitGroup{}
 
 	hbWriteCh := make(chan *writeMsg)
@@ -59,7 +62,11 @@ func New(peerID, ethAdrr string) (*Bonus, error) {
 		retryInterval: retryInterval,
 		dialTimeout:   dialTimeout,
 		pingTimeout:   pingTimeout,
+
+		stateStorer: storer,
 	}
+
+	initStateStorer(b.stateStorer)
 
 	go b.serveHeartbeater()
 
