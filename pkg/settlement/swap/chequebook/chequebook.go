@@ -13,11 +13,11 @@ import (
 	"sync"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/erc20"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
-	"github.com/ethersphere/go-sw3-abi/sw3abi"
 )
 
 // SendChequeFunc is a function to send cheques.
@@ -34,7 +34,7 @@ var (
 	// ErrInsufficientFunds is the error when the chequebook has not enough free funds for a user action
 	ErrInsufficientFunds = errors.New("insufficient token balance")
 
-	chequebookABI          = transaction.ParseABIUnchecked(sw3abi.ERC20SimpleSwapABIv0_3_1)
+	chequebookABI          = transaction.ParseABIUnchecked(nswabi.RewardBookABIv0_1_0)
 	chequeCashedEventType  = chequebookABI.Events["ChequeCashed"]
 	chequeBouncedEventType = chequebookABI.Events["ChequeBounced"]
 )

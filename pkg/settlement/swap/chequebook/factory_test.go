@@ -13,15 +13,15 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequebook"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
 	"github.com/newswarm-lab/new-bee/pkg/transaction/backendmock"
 	transactionmock "github.com/newswarm-lab/new-bee/pkg/transaction/mock"
-	"github.com/ethersphere/go-sw3-abi/sw3abi"
 )
 
 var (
-	factoryABI              = transaction.ParseABIUnchecked(sw3abi.SimpleSwapFactoryABIv0_4_0)
+	factoryABI              = transaction.ParseABIUnchecked(nswabi.CheckBookFactoryABIv0_1_0)
 	simpleSwapDeployedEvent = factoryABI.Events["SimpleSwapDeployed"]
 )
 
@@ -75,9 +75,9 @@ func TestFactoryVerifySelf(t *testing.T) {
 	t.Run("valid", func(t *testing.T) {
 		factory := chequebook.NewFactory(
 			backendWithCodeAt(map[common.Address]string{
-				factoryAddress: sw3abi.SimpleSwapFactoryDeployedBinv0_4_0,
-				legacyFactory1: sw3abi.SimpleSwapFactoryDeployedBinv0_3_1,
-				legacyFactory2: sw3abi.SimpleSwapFactoryDeployedBinv0_3_1,
+				factoryAddress: nswabi.CheckBookFactoryDeployedBinv0_1_0,
+				legacyFactory1: nswabi.CheckBookFactoryDeployedBinv0_1_0,
+				legacyFactory2: nswabi.CheckBookFactoryDeployedBinv0_1_0,
 			}),
 			transactionmock.New(),
 			factoryAddress,
@@ -112,8 +112,8 @@ func TestFactoryVerifySelf(t *testing.T) {
 	t.Run("invalid legacy factories", func(t *testing.T) {
 		factory := chequebook.NewFactory(
 			backendWithCodeAt(map[common.Address]string{
-				factoryAddress: sw3abi.SimpleSwapFactoryDeployedBinv0_4_0,
-				legacyFactory1: sw3abi.SimpleSwapFactoryDeployedBinv0_3_1,
+				factoryAddress: nswabi.CheckBookFactoryDeployedBinv0_1_0,
+				legacyFactory1: nswabi.CheckBookFactoryDeployedBinv0_1_0,
 				legacyFactory2: "abcd",
 			}),
 			transactionmock.New(),
