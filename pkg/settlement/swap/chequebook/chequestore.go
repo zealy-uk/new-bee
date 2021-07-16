@@ -27,6 +27,7 @@ const (
 var (
 	// ErrNoCheque is the error returned if there is no prior cheque for a chequebook or beneficiary.
 	ErrNoCheque = errors.New("no cheque")
+	ErrNoBonusCheque = errors.New("no bonus cheque")
 	// ErrChequeNotIncreasing is the error returned if the cheque amount is the same or lower.
 	ErrChequeNotIncreasing = errors.New("cheque cumulativePayout is not increasing")
 	// ErrChequeInvalid is the error returned if the cheque itself is invalid.
@@ -39,9 +40,7 @@ var (
 	ErrChequeValueTooLow = errors.New("cheque value lower than acceptable")
 )
 
-var (
-	bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
-)
+var bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
 
 // ChequeStore handles the verification and storage of received cheques
 type ChequeStore interface {
@@ -50,6 +49,7 @@ type ChequeStore interface {
 	ReceiveBonusCheque(ctx context.Context, cheque *SignedCheque) (*big.Int, error)
 	// LastCheque returns the last cheque we received from a specific chequebook.
 	LastCheque(chequebook common.Address) (*SignedCheque, error)
+	LastBonusCheque(chequebook common.Address) (*SignedCheque, error)
 	// LastCheques returns the last received cheques from every known chequebook.
 	LastCheques() (map[common.Address]*SignedCheque, error)
 }
@@ -106,6 +106,30 @@ func (s *chequeStore) LastCheque(chequebook common.Address) (*SignedCheque, erro
 
 	return cheque, nil
 }
+
+func (s *chequeStore) LastBonusCheque(chequebook common.Address) (*SignedCheque, error) {
+	if len(bonusReceivedCheque) < 1 {
+		return nil, ErrNoBonusCheque
+	}
+
+	lastBonusCheque := bonusReceivedCheque[0]
+	bonusReceivedCheque = bonusReceivedCheque[1:]
+
+	return lastBonusCheque, nil
+}
+
+// todo: load bonus cheque
+//func (s *chequeStore) loadBonusCheque() error  {
+//	if bonusReceivedCheque == nil {
+//		bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
+//
+//		iterFn := func(key, value []byte) (stop bool, err error) {
+//
+//		}
+//		s.store.Iterate(bonusReceivedChequePrefix, iterFn)
+//	}
+//}
+
 
 // ReceiveCheque verifies and stores a cheque. It returns the totam amount earned.
 func (s *chequeStore) ReceiveCheque(ctx context.Context, cheque *SignedCheque, exchangeRate, deduction *big.Int) (*big.Int, error) {

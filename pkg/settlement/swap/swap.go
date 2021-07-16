@@ -40,6 +40,7 @@ type Interface interface {
 	LastReceivedCheques() (map[string]*chequebook.SignedCheque, error)
 	// CashCheque sends a cashing transaction for the last cheque of the peer
 	CashCheque(ctx context.Context, peer swarm.Address) (common.Hash, error)
+	CashBonusCheque(ctx context.Context, peer swarm.Address) (common.Hash, error)
 	// CashoutStatus gets the status of the latest cashout transaction for the peers chequebook
 	CashoutStatus(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error)
 }
@@ -366,6 +367,18 @@ func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Ha
 	}
 	return s.cashout.CashCheque(ctx, chequebookAddress, s.chequebook.Address())
 }
+
+func (s *Service) CashBonusCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
+	chequebookAddress, known, err := s.addressbook.Chequebook(peer)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	if !known {
+		return common.Hash{}, chequebook.ErrNoCheque
+	}
+	return s.cashout.CashBonusCheque(ctx, chequebookAddress, s.chequebook.Address())
+}
+
 
 // CashoutStatus gets the status of the latest cashout transaction for the peers chequebook
 func (s *Service) CashoutStatus(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error) {

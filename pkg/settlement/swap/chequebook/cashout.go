@@ -28,6 +28,7 @@ var (
 type CashoutService interface {
 	// CashCheque sends a cashing transaction for the last cheque of the chequebook
 	CashCheque(ctx context.Context, chequebook common.Address, recipient common.Address) (common.Hash, error)
+	CashBonusCheque(ctx context.Context, chequebook common.Address, recipient common.Address) (common.Hash, error)
 	// CashoutStatus gets the status of the latest cashout transaction for the chequebook
 	CashoutStatus(ctx context.Context, chequebookAddress common.Address) (*CashoutStatus, error)
 }
@@ -98,6 +99,10 @@ func cashoutActionKey(chequebook common.Address) string {
 	return fmt.Sprintf("swap_cashout_%x", chequebook)
 }
 
+func bonusCashoutActionKey(cheque *SignedCheque) string {
+	return fmt.Sprintf("swap_bonus_cashout_%x_%x_%x", cheque.Chequebook, cheque.Beneficiary, cheque.Id)
+}
+
 func (s *cashoutService) paidOut(ctx context.Context, chequebook, beneficiary common.Address) (*big.Int, error) {
 	callData, err := chequebookABI.Pack("paidOut", beneficiary)
 	if err != nil {
@@ -136,7 +141,7 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 		return common.Hash{}, err
 	}
 
-	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
+	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Signature)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -160,6 +165,48 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 	}
 
 	err = s.store.Put(cashoutActionKey(chequebook), &cashoutAction{
+		TxHash: txHash,
+		Cheque: *cheque,
+	})
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	return txHash, nil
+}
+
+
+// todo: delete bonus cheque after CashBonusCheque success.
+func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error)  {
+	cheque, err := s.chequeStore.LastBonusCheque(chequebook)
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	lim := sctx.GetGasLimit(ctx)
+	if lim == 0 {
+		// fix for out of gas errors
+		lim = 300000
+	}
+	request := &transaction.TxRequest{
+		To:          &chequebook,
+		Data:        callData,
+		GasPrice:    sctx.GetGasPrice(ctx),
+		GasLimit:    lim,
+		Value:       big.NewInt(0),
+		Description: "cheque cashout",
+	}
+
+	txHash, err := s.transactionService.Send(ctx, request)
+	if err != nil {
+		return common.Hash{}, err
+	}
+
+	err = s.store.Put(bonusCashoutActionKey(cheque), &cashoutAction{
 		TxHash: txHash,
 		Cheque: *cheque,
 	})
