@@ -11,13 +11,15 @@ import (
 
 type TCPClient struct {
 	sync.Mutex
-	DstAddr         string
-	HeartbeatExpire int64
-	PendingWriteNum uint16
-	AutoReconnect   bool
-	session         *Session
-	closeFlag       bool
-	processor       TcpProcessor
+	DstAddr          string
+	HeartbeatExpire  int64
+	PendingWriteNum  uint16
+	AutoReconnect    bool
+	session          *Session
+	closeFlag        bool
+	processor        TcpProcessor
+	Pingpong         PingPongFunc
+	PingpongInterval uint32
 }
 
 // NewTCPClient ...
@@ -89,6 +91,7 @@ reConnect:
 		return
 	}
 	slf.session = newSession(conn, slf.PendingWriteNum, slf.processor)
+	slf.session.SetPingPong(slf.Pingpong, slf.PingpongInterval)
 	slf.Unlock()
 	slf.session.Start()
 	if slf.AutoReconnect && !slf.closeFlag {

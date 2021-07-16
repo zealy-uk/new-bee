@@ -18,6 +18,7 @@ type MyTcpProcessor struct {
 }
 
 func (slf *MyTcpProcessor) OnConnectSucc(session *network.Session) {
+	session.SetWritable(false)
 	log.Info("client connect,session:%d[%s]", session.GetID(), session.RemoteAddr().String())
 }
 func (slf *MyTcpProcessor) OnConnectClose(session *network.Session) {
@@ -39,9 +40,9 @@ func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Mess
 	sCipher := network.NewRc4Cipher([]byte(res.SvrKey))
 	cCipher := network.NewRc4Cipher([]byte(res.CltKey))
 	session.SetCipher(sCipher, cCipher)
-
 	session.SetWritable(true)
-	session.SetPingPong(slf.Heartbeat, 15)
+
+	log.Info("client recv CipherKeyNtf,session:%d[%s]", session.GetID(), session.RemoteAddr().String())
 }
 
 func (slf *MyTcpProcessor) HeartbeatRsp(session *network.Session, msg proto.Message) {
