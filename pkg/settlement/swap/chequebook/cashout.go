@@ -136,7 +136,7 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 		return common.Hash{}, err
 	}
 
-	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Signature)
+	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
 	if err != nil {
 		return common.Hash{}, err
 	}
