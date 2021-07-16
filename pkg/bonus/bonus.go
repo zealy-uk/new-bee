@@ -3,22 +3,24 @@ package bonus
 import (
 	"flag"
 	"sync"
-	"verifycenter/log"
+
+	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/network"
+	"github.com/sirupsen/logrus"
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/client"
 )
 
-func startBonus() {
+func startBonus(logger *logrus.Logger) {
 
 	var svrAddr string
 	flag.StringVar(&svrAddr, "svr", "139.162.90.128:9527", "default 139.162.90.128:9527")
 	flag.Parse()
 
-	log.Init("", "client", 5)
+	log.Init(logger)
 
 	clientProcessor := &MyTcpProcessor{}
 	clientProcessor.MsgHandles = make(map[uint16]network.MsgHander)

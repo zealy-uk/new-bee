@@ -1,7 +1,7 @@
 package network
 
 import (
-	"verifycenter/log"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"

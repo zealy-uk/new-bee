@@ -1,7 +1,7 @@
 package bonus
 
 import (
-	"verifycenter/log"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 	"github.com/newswarm-lab/new-bee/pkg/bonus/network"

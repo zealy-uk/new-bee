@@ -5,7 +5,8 @@ import (
 	"net"
 	"sync"
 	"time"
-	"verifycenter/log"
+
+	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 )
 
 type TCPClient struct {
