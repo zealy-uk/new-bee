@@ -19,10 +19,10 @@ var (
 type chequeHandler struct {
 	p2pCtx context.Context
 	peer swarm.Address
-	swap swap.Service
+	swap *swap.Service
 }
 
-func newChequeHanler(p2pCtx context.Context, peer swarm.Address, swap swap.Service) *chequeHandler {
+func newChequeHanler(p2pCtx context.Context, peer swarm.Address, swap *swap.Service) *chequeHandler {
 	return &chequeHandler{
 		p2pCtx: p2pCtx,
 		peer: peer,

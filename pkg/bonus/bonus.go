@@ -34,12 +34,12 @@ type Bonus struct {
 	pingTimeout   time.Duration
 
 	p2pCtx context.Context
-	swap swap.Service
+	swap *swap.Service
 
 	chequeHandler *chequeHandler
 }
 
-func New(p2pCtx context.Context, swap swap.Service, peer swarm.Address, ethAdrr, beneficiary common.Address) (*Bonus, error) {
+func New(p2pCtx context.Context, swap *swap.Service, peer swarm.Address, ethAdrr, beneficiary common.Address) (*Bonus, error) {
 	wg := &sync.WaitGroup{}
 
 	hbWriteCh := make(chan *writeMsg)
