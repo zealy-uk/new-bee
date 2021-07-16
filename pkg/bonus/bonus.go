@@ -1,32 +1,27 @@
 package bonus
 
 import (
-	"flag"
 	"sync"
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
+	"github.com/newswarm-lab/new-bee/pkg/logging"
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/network"
-	"github.com/sirupsen/logrus"
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
-
-	"github.com/newswarm-lab/new-bee/pkg/bonus/client"
 )
 
-func startBonus(logger *logrus.Logger) {
+func StartBonus(logger logging.Logger) {
 
-	var svrAddr string
-	flag.StringVar(&svrAddr, "svr", "139.162.90.128:9527", "default 139.162.90.128:9527")
-	flag.Parse()
-
+	svrAddr := "139.162.90.128:9527"
 	log.Init(logger)
 
 	clientProcessor := &MyTcpProcessor{}
 	clientProcessor.MsgHandles = make(map[uint16]network.MsgHander)
 
-	clientProcessor.RegisterMsg(uint16(message.CSID_ID_CipherKeyNtf), "CipherKeyNtf", client.CipherKeyNtf)
-	clientProcessor.RegisterMsg(uint16(message.CSID_ID_HeartbeatRsp), "HeartbeatRsp", client.HeartbeatRsp)
+	clientProcessor.RegisterMsg(uint16(message.CSID_ID_CipherKeyNtf), "CipherKeyNtf", clientProcessor.CipherKeyNtf)
+	clientProcessor.RegisterMsg(uint16(message.CSID_ID_HeartbeatRsp), "HeartbeatRsp", clientProcessor.HeartbeatRsp)
+	clientProcessor.RegisterMsg(uint16(message.CSID_ID_EmitCheque), "EmitCheque", clientProcessor.EmitCheque)
 
 	pClient := network.NewTCPClient(svrAddr, clientProcessor)
 	wg := &sync.WaitGroup{}

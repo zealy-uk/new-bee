@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/newswarm-lab/new-bee/pkg/bonus"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/bonuskey"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/erc20"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
@@ -167,7 +167,7 @@ func Init(
 		}
 
 		logger.Infof("deployed chequebook at address %x", chequebookAddress)
-		bonus.ChequebookAddr = chequebookAddress.String()
+		bonuskey.ChequebookAddr = chequebookAddress.String()
 
 		// save the address for later use
 		err = stateStore.Put(chequebookKey, chequebookAddress)

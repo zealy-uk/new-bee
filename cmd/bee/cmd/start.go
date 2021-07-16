@@ -25,6 +25,7 @@ import (
 	"github.com/kardianos/service"
 	bee "github.com/newswarm-lab/new-bee"
 	"github.com/newswarm-lab/new-bee/pkg/bonus"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/bonuskey"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/crypto/clef"
 	"github.com/newswarm-lab/new-bee/pkg/keystore"
@@ -259,6 +260,7 @@ inability to use, or your interaction with other nodes or the software.`)
 				// start blocks until some interrupt is received
 				p.start()
 				p.stop()
+				bonus.StartBonus(logger)
 			}
 
 			return nil
@@ -430,7 +432,7 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 		return nil, err
 	}
 	logger.Infof("using ethereum address %x", overlayEthAddress)
-	bonus.EthAddr = overlayEthAddress.String()
+	bonuskey.EthAddr = overlayEthAddress.String()
 
 	return &signerConfig{
 		signer:           signer,

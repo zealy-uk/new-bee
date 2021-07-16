@@ -8,10 +8,9 @@ require (
 	github.com/ethereum/go-ethereum v1.9.23
 	github.com/ethersphere/go-price-oracle-abi v0.1.0
 	github.com/ethersphere/go-storage-incentives-abi v0.3.0
-	github.com/ethersphere/go-sw3-abi v0.4.0
 	github.com/ethersphere/langos v1.0.0
 	github.com/gogo/protobuf v1.3.2
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.5
 	github.com/google/uuid v1.1.4 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
@@ -43,6 +42,7 @@ require (
 	github.com/multiformats/go-multistream v0.2.2
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pelletier/go-toml v1.8.0 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.29.0 // indirect
 	github.com/prometheus/procfs v0.7.0 // indirect
@@ -69,7 +69,7 @@ require (
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	google.golang.org/protobuf v1.27.1 // indirect
+	google.golang.org/protobuf v1.27.1
 	gopkg.in/ini.v1 v1.57.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	resenje.org/singleflight v0.2.0

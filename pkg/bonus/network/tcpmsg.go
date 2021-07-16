@@ -6,11 +6,14 @@ import (
 	"io"
 	"net"
 	"time"
+
+	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 )
 
 var (
-	MaxMsgLen = uint16(10 * 1024)
-	MinMsgLen = uint16(2)
+	TCP_TIMEOUT = 20
+	MaxMsgLen   = uint16(10 * 1024)
+	MinMsgLen   = uint16(2)
 )
 
 type MsgParser struct {
@@ -51,7 +54,9 @@ func (slf *MsgParser) Read(conn net.Conn) ([]byte, error) {
 	}
 
 	if slf.cipher != nil {
+		log.Trace("before cipher decrypt:%x", msgData)
 		msgData = slf.cipher.Decrypt(msgData)
+		log.Trace("after cipher decrypt:%x", msgData)
 	}
 
 	return msgData, nil
@@ -74,13 +79,18 @@ func (slf *MsgParser) Write(conn net.Conn, msgData []byte) error {
 
 	//encrypt
 	if slf.cipher != nil {
+		log.Trace("before cipher encrypt:%x", msgData)
 		msgData = slf.cipher.Encrypt(msgData)
+		log.Trace("after cipher encrypt:%x", msgData)
 	}
 
 	//put data
 	pkg = append(pkg, msgData...)
 
 	n, err := conn.Write(pkg)
+	if err != nil {
+		log.Error("%s write %d :%v", conn.RemoteAddr().String(), n, err)
+	}
 
-	return err
+	return nil
 }

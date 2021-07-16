@@ -10,14 +10,14 @@ import (
 )
 
 type TCPClient struct {
-	sync.Mutex                   //同步保护
-	DstAddr         string       //tcpserver地址信息
-	HeartbeatExpire int64        //心跳超时时间(s)//todo 待完成
-	PendingWriteNum uint16       //最大连接Pending写包数量
-	AutoReconnect   bool         //是否自动重连
-	session         *Session     //tcp连接session
-	closeFlag       bool         //client关闭标志
-	processor       TcpProcessor //逻辑处理器
+	sync.Mutex
+	DstAddr         string
+	HeartbeatExpire int64
+	PendingWriteNum uint16
+	AutoReconnect   bool
+	session         *Session
+	closeFlag       bool
+	processor       TcpProcessor
 }
 
 // NewTCPClient ...
@@ -64,7 +64,6 @@ func (slf *TCPClient) SyncWriteMsg(msg []byte) error {
 	return errors.New("session is nil")
 }
 
-//WriteMsg 异步发送消息,通常情况下都应该使用该接口
 func (slf *TCPClient) WriteMsg(msg []byte) error {
 	if slf.session != nil {
 		return slf.session.WriteMsg(msg)

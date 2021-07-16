@@ -18,21 +18,21 @@ var (
 type PingPongFunc func(session *Session)
 
 type Session struct {
-	sync.Mutex                      //同步保护
+	sync.Mutex
 	waitGroup        sync.WaitGroup //sync
 	sessionID        uint32         //sessionid
-	conn             net.Conn       //网络连接
-	writePending     chan []byte    //连接发送缓冲
-	pendingWriteNum  uint16         //最大连接发送缓冲消息数
-	closeCtrl        chan bool      //关闭控制信号
-	closeFlag        bool           //连接关闭标志
-	recvParser       *MsgParser     //网络消息编解码处理
-	sendParser       *MsgParser     //网络消息编解码处理
-	msgProcessor     TcpProcessor   //网络消息处理
-	activeTime       int64          //tcp连接最近活跃时间戳
-	Writable         bool           //连接可写标志
-	pingPong         PingPongFunc   //pingpong心跳函数
-	pingPongInterval int64          //pingpong心跳函数发送周期
+	conn             net.Conn
+	writePending     chan []byte
+	pendingWriteNum  uint16
+	closeCtrl        chan bool
+	closeFlag        bool
+	recvParser       *MsgParser
+	sendParser       *MsgParser
+	msgProcessor     TcpProcessor
+	activeTime       int64
+	Writable         bool
+	pingPong         PingPongFunc
+	pingPongInterval int64
 }
 
 func newSession(conn net.Conn, pendingWriteNum uint16, processor TcpProcessor) *Session {
@@ -47,8 +47,8 @@ func newSession(conn net.Conn, pendingWriteNum uint16, processor TcpProcessor) *
 		pendingWriteNum: pendingWriteNum,
 		closeCtrl:       make(chan bool),
 		closeFlag:       false,
-		recvParser:      NewMsgParser(nil), //初始化为不加密的信道
-		sendParser:      NewMsgParser(nil), //初始化为不加密的信道
+		recvParser:      NewMsgParser(nil),
+		sendParser:      NewMsgParser(nil),
 		msgProcessor:    processor,
 		activeTime:      time.Now().Unix(),
 		Writable:        true,
@@ -65,13 +65,11 @@ func newSession(conn net.Conn, pendingWriteNum uint16, processor TcpProcessor) *
 	return session
 }
 
-//SetCipher 调用之后收发包按照新设置的加解密模块执行
 func (slf *Session) SetCipher(recv, send Cipher) {
 	slf.recvParser = NewMsgParser(recv)
 	slf.sendParser = NewMsgParser(send)
 }
 
-//Start 开启收发包协程,
 func (slf *Session) Start() {
 	slf.msgProcessor.OnConnectSucc(slf)
 	slf.waitGroup.Add(1)
@@ -81,27 +79,22 @@ func (slf *Session) Start() {
 	slf.msgProcessor.OnConnectClose(slf)
 }
 
-//Close 服务器逻辑主动关闭连接会话
 func (slf *Session) Close() {
 	slf.close()
 }
 
-//LocalAddr 获取本地地址
 func (slf *Session) LocalAddr() net.Addr {
 	return slf.conn.LocalAddr()
 }
 
-//RemoteAddr 获取远端地址
 func (slf *Session) RemoteAddr() net.Addr {
 	return slf.conn.RemoteAddr()
 }
 
-//GetActiveTime 获取最近活跃时间戳
 func (slf *Session) GetActiveTime() int64 {
 	return slf.activeTime
 }
 
-//GetID 获取sessionid
 func (slf *Session) GetID() uint32 {
 	return slf.sessionID
 }
@@ -115,7 +108,6 @@ func (slf *Session) SetPingPong(pingpong PingPongFunc, interval uint32) {
 	slf.pingPongInterval = int64(interval)
 }
 
-//SyncWriteMsg 同步发送消息,只有刚建立连接时使用该函数，后续使用会导致乱序错误
 func (slf *Session) SyncWriteMsg(msg []byte) error {
 	if !slf.Writable {
 		return errors.New("session Writable false")
@@ -123,7 +115,6 @@ func (slf *Session) SyncWriteMsg(msg []byte) error {
 	return slf.sendParser.Write(slf.conn, msg)
 }
 
-//WriteMsg 异步发送消息,通常情况下都应该使用该接口
 func (slf *Session) WriteMsg(msg []byte) error {
 	if !slf.Writable {
 		return errors.New("session Writable false")
