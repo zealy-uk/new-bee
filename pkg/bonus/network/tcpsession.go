@@ -71,6 +71,7 @@ func (slf *Session) SetCipher(recv, send Cipher) {
 }
 
 func (slf *Session) Start() {
+	log.Info("tcp session %d addr %s connnect succ", slf.GetID(), slf.RemoteAddr().String())
 	slf.msgProcessor.OnConnectSucc(slf)
 	slf.waitGroup.Add(1)
 	go slf.writeLoop()
@@ -80,6 +81,7 @@ func (slf *Session) Start() {
 }
 
 func (slf *Session) Close() {
+	log.Info("server kickout tcp session %d", slf.GetID())
 	slf.close()
 }
 
@@ -124,6 +126,7 @@ func (slf *Session) WriteMsg(msg []byte) error {
 		return nil
 	}
 
+	log.Error("sender overflow, pending:%d tcp session:%d", uint16(len(slf.writePending)), slf.GetID())
 	return fmt.Errorf("sender overflow, tcp session:%d", slf.GetID())
 }
 

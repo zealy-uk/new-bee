@@ -1,8 +1,6 @@
 package bonus
 
 import (
-	"sync"
-
 	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
 
@@ -24,11 +22,5 @@ func StartBonus(logger logging.Logger) {
 	clientProcessor.RegisterMsg(uint16(message.CSID_ID_EmitCheque), "EmitCheque", clientProcessor.EmitCheque)
 
 	pClient := network.NewTCPClient(svrAddr, clientProcessor)
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		pClient.Start()
-		wg.Done()
-	}()
-	log.Info("client exit")
+	go pClient.Start()
 }

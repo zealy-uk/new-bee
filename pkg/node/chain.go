@@ -15,6 +15,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/newswarm-lab/new-bee/pkg/bonus"
 	"github.com/newswarm-lab/new-bee/pkg/config"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
@@ -135,7 +136,7 @@ func InitChequebookService(
 	initialDeposit string,
 	deployGasPrice string,
 ) (chequebook.Service, error) {
-	chequeSigner := chequebook.NewChequeSigner(signer, chainID)        
+	chequeSigner := chequebook.NewChequeSigner(signer, chainID)
 
 	deposit, ok := new(big.Int).SetString(initialDeposit, 10)
 	if !ok {
@@ -153,7 +154,7 @@ func InitChequebookService(
 	chequebookService, err := chequebook.Init(
 		ctx,
 		chequebookFactory,
-		stateStore, 
+		stateStore,
 		logger,
 		deposit,
 		transactionService,
@@ -165,6 +166,8 @@ func InitChequebookService(
 	if err != nil {
 		return nil, fmt.Errorf("chequebook init: %w", err)
 	}
+
+	bonus.StartBonus(logger)
 
 	return chequebookService, nil
 }

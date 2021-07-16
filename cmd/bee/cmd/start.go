@@ -24,7 +24,6 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/kardianos/service"
 	bee "github.com/newswarm-lab/new-bee"
-	"github.com/newswarm-lab/new-bee/pkg/bonus"
 	"github.com/newswarm-lab/new-bee/pkg/bonus/bonuskey"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/crypto/clef"
@@ -260,7 +259,6 @@ inability to use, or your interaction with other nodes or the software.`)
 				// start blocks until some interrupt is received
 				p.start()
 				p.stop()
-				bonus.StartBonus(logger)
 			}
 
 			return nil
