@@ -73,7 +73,7 @@ func NewFactory(backend transaction.Backend, transactionService transaction.Serv
 
 // Deploy deploys a new chequebook and returns once the transaction has been submitted.
 func (c *factory) Deploy(ctx context.Context, issuer common.Address, defaultHardDepositTimeoutDuration *big.Int, nonce common.Hash) (common.Hash, error) {
-	callData, err := factoryABI.Pack("deploySimpleSwap", issuer, big.NewInt(0).Set(defaultHardDepositTimeoutDuration), nonce)
+	callData, err := factoryABI.Pack("CreateRewardChequeBook", issuer)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -82,7 +82,7 @@ func (c *factory) Deploy(ctx context.Context, issuer common.Address, defaultHard
 		To:          &c.address,
 		Data:        callData,
 		GasPrice:    sctx.GetGasPrice(ctx),
-		GasLimit:    175000,
+		GasLimit:    1750000,
 		Value:       big.NewInt(0),
 		Description: "chequebook deployment",
 	}
@@ -119,7 +119,8 @@ func (c *factory) VerifyBytecode(ctx context.Context) (err error) {
 	}
 
 	if !bytes.Equal(code, currentDeployVersion) {
-		return ErrInvalidFactory
+		return fmt.Errorf("VerifyBytecode error: code:%x\ncurrentDeployVersion: %x", code, currentDeployVersion)
+		//return ErrInvalidFactory
 	}
 
 LOOP:

@@ -135,7 +135,7 @@ func InitChequebookService(
 	initialDeposit string,
 	deployGasPrice string,
 ) (chequebook.Service, error) {
-	chequeSigner := chequebook.NewChequeSigner(signer, chainID)
+	chequeSigner := chequebook.NewChequeSigner(signer, chainID)        
 
 	deposit, ok := new(big.Int).SetString(initialDeposit, 10)
 	if !ok {
@@ -153,7 +153,7 @@ func InitChequebookService(
 	chequebookService, err := chequebook.Init(
 		ctx,
 		chequebookFactory,
-		stateStore,
+		stateStore, 
 		logger,
 		deposit,
 		transactionService,

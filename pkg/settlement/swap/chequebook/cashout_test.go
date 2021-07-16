@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	chequebookABI          = transaction.ParseABIUnchecked(nswabi.RewardBookABIv0_1_0)
+	chequebookABI          = transaction.ParseABIUnchecked(nswabi.RewardChequeBookABIv0_1_0)
 	chequeCashedEventType  = chequebookABI.Events["ChequeCashed"]
 	chequeBouncedEventType = chequebookABI.Events["ChequeBounced"]
 )
