@@ -21,7 +21,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/kardianos/service"
 	bee "github.com/newswarm-lab/new-bee"
@@ -397,11 +396,6 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 		}
 		signer = crypto.NewDefaultSigner(swarmPrivateKey)
 		publicKey = &swarmPrivateKey.PublicKey
-
-		//add for private key
-		privateKeyBytes := crypto.EncodeSecp256k1PrivateKey(swarmPrivateKey)
-		hexPrivateKey := hexutil.Encode(privateKeyBytes)
-		logger.Infof("swarm private key:%s", hexPrivateKey)
 
 	}
 
