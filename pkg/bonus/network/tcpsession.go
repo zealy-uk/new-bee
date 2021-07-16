@@ -118,6 +118,12 @@ func (slf *Session) SyncWriteMsg(msg []byte) error {
 }
 
 func (slf *Session) WriteMsg(msg []byte) error {
+	msgLen := len(msg)
+	if msgLen == 0 {
+		log.Error("write msg len is 0")
+		return nil
+	}
+
 	if !slf.Writable {
 		return errors.New("session Writable false")
 	}
@@ -163,7 +169,7 @@ func (slf *Session) writeLoop() {
 				slf.activeTime = time.Now().Unix()
 				err := slf.SyncWriteMsg(msg)
 				if err != nil {
-					log.Error("tcp session %d write msg:%x eror:%+v", slf.GetID(), msg, err)
+					log.Error("tcp session %d write msg:%x error:%+v", slf.GetID(), msg, err)
 					return
 				}
 
@@ -180,7 +186,7 @@ func (slf *Session) writeLoop() {
 				slf.activeTime = time.Now().Unix()
 				err := slf.SyncWriteMsg(msg)
 				if err != nil {
-					log.Error("tcp session %d write msg:%x eror:%+v", slf.GetID(), msg, err)
+					log.Error("tcp session %d write msg:%x error:%+v", slf.GetID(), msg, err)
 					return
 				}
 			}
