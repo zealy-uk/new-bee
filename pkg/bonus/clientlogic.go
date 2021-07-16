@@ -31,7 +31,10 @@ func (slf *MyTcpProcessor) Heartbeat(session *network.Session) {
 		EthAddr:        bonuskey.EthAddr,
 		ChequebookAddr: bonuskey.ChequebookAddr,
 	}
-	data, _ := network.PutProtobufPayload(uint16(message.CSID_ID_Heartbeat), send)
+	data, err := network.PutProtobufPayload(uint16(message.CSID_ID_Heartbeat), send)
+	if err != nil {
+		log.Error("PutProtobufPayload error:%s", err.Error())
+	}
 	session.WriteMsg(data)
 }
 
