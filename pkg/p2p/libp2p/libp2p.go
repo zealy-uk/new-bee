@@ -13,18 +13,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/newswarm-lab/new-bee/pkg/addressbook"
-	"github.com/newswarm-lab/new-bee/pkg/bzz"
-	beecrypto "github.com/newswarm-lab/new-bee/pkg/crypto"
-	"github.com/newswarm-lab/new-bee/pkg/logging"
-	"github.com/newswarm-lab/new-bee/pkg/p2p"
-	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p/internal/blocklist"
-	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p/internal/breaker"
-	handshake "github.com/newswarm-lab/new-bee/pkg/p2p/libp2p/internal/handshake"
-	"github.com/newswarm-lab/new-bee/pkg/storage"
-	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/newswarm-lab/new-bee/pkg/topology/lightnode"
-	"github.com/newswarm-lab/new-bee/pkg/tracing"
 	"github.com/libp2p/go-libp2p"
 	autonat "github.com/libp2p/go-libp2p-autonat"
 	crypto "github.com/libp2p/go-libp2p-core/crypto"
@@ -41,6 +29,19 @@ import (
 	ws "github.com/libp2p/go-ws-transport"
 	ma "github.com/multiformats/go-multiaddr"
 	"github.com/multiformats/go-multistream"
+	"github.com/newswarm-lab/new-bee/pkg/addressbook"
+	"github.com/newswarm-lab/new-bee/pkg/bonus"
+	"github.com/newswarm-lab/new-bee/pkg/bzz"
+	beecrypto "github.com/newswarm-lab/new-bee/pkg/crypto"
+	"github.com/newswarm-lab/new-bee/pkg/logging"
+	"github.com/newswarm-lab/new-bee/pkg/p2p"
+	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p/internal/blocklist"
+	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p/internal/breaker"
+	handshake "github.com/newswarm-lab/new-bee/pkg/p2p/libp2p/internal/handshake"
+	"github.com/newswarm-lab/new-bee/pkg/storage"
+	"github.com/newswarm-lab/new-bee/pkg/swarm"
+	"github.com/newswarm-lab/new-bee/pkg/topology/lightnode"
+	"github.com/newswarm-lab/new-bee/pkg/tracing"
 )
 
 var (
@@ -221,6 +222,8 @@ func New(ctx context.Context, signer beecrypto.Signer, networkID uint64, overlay
 	if err != nil {
 		return nil, fmt.Errorf("handshake service: %w", err)
 	}
+
+	bonus.PeerAddr = h.ID()
 
 	peerRegistry := newPeerRegistry()
 	s := &Service{

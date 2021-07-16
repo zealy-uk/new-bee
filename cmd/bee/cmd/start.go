@@ -24,6 +24,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/kardianos/service"
 	bee "github.com/newswarm-lab/new-bee"
+	"github.com/newswarm-lab/new-bee/pkg/bonus"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/crypto/clef"
 	"github.com/newswarm-lab/new-bee/pkg/keystore"
@@ -429,6 +430,7 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 		return nil, err
 	}
 	logger.Infof("using ethereum address %x", overlayEthAddress)
+	bonus.EthAddr = overlayEthAddress.String()
 
 	return &signerConfig{
 		signer:           signer,
