@@ -21,6 +21,7 @@ import (
 const (
 	// prefix for the persistence key
 	lastReceivedChequePrefix = "swap_chequebook_last_received_cheque_"
+	bonusReceivedChequePrefix = "swap_chequebook_bonus_received_cheque_"
 )
 
 var (
@@ -38,10 +39,15 @@ var (
 	ErrChequeValueTooLow = errors.New("cheque value lower than acceptable")
 )
 
+var (
+	bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
+)
+
 // ChequeStore handles the verification and storage of received cheques
 type ChequeStore interface {
 	// ReceiveCheque verifies and stores a cheque. It returns the total amount earned.
 	ReceiveCheque(ctx context.Context, cheque *SignedCheque, exchangeRate, deduction *big.Int) (*big.Int, error)
+	ReceiveBonusCheque(ctx context.Context, cheque *SignedCheque) (*big.Int, error)
 	// LastCheque returns the last cheque we received from a specific chequebook.
 	LastCheque(chequebook common.Address) (*SignedCheque, error)
 	// LastCheques returns the last received cheques from every known chequebook.
@@ -81,6 +87,10 @@ func NewChequeStore(
 // lastReceivedChequeKey computes the key where to store the last cheque received from a chequebook.
 func lastReceivedChequeKey(chequebook common.Address) string {
 	return fmt.Sprintf("%s_%x", lastReceivedChequePrefix, chequebook)
+}
+
+func bonusReceivedChequeKey(chequebook common.Address, chequeId *big.Int) string {
+	return fmt.Sprintf("%s_%x_%x", bonusReceivedChequePrefix, chequebook, chequeId)
 }
 
 // LastCheque returns the last cheque we received from a specific chequebook.
@@ -184,6 +194,15 @@ func (s *chequeStore) ReceiveCheque(ctx context.Context, cheque *SignedCheque, e
 	}
 
 	return amount, nil
+}
+
+func (s *chequeStore)  ReceiveBonusCheque(ctx context.Context, cheque *SignedCheque) (*big.Int, error) {
+		if err := s.store.Put(bonusReceivedChequeKey(cheque.Chequebook, cheque.Id), cheque); err != nil {
+			return nil, err
+		}
+	bonusReceivedCheque = append(bonusReceivedCheque, cheque)
+	fmt.Printf("Succesfully received and appended bonus cheque from %v: %v\n", cheque.Chequebook, cheque.CumulativePayout)
+	return cheque.CumulativePayout, nil
 }
 
 // RecoverCheque recovers the issuer ethereum address from a signed cheque
