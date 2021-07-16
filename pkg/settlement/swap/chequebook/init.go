@@ -167,7 +167,6 @@ func Init(
 		}
 
 		logger.Infof("deployed chequebook at address %x", chequebookAddress)
-		bonuskey.ChequebookAddr = chequebookAddress.String()
 
 		// save the address for later use
 		err = stateStore.Put(chequebookKey, chequebookAddress)
@@ -203,6 +202,8 @@ func Init(
 
 		logger.Infof("using existing chequebook %x", chequebookAddress)
 	}
+
+	bonuskey.ChequebookAddr = chequebookAddress.String()
 
 	// regardless of how the chequebook service was initialised make sure that the chequebook is valid
 	err = chequebookFactory.VerifyChequebook(ctx, chequebookService.Address())

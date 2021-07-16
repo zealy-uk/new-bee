@@ -223,7 +223,7 @@ func New(ctx context.Context, signer beecrypto.Signer, networkID uint64, overlay
 		return nil, fmt.Errorf("handshake service: %w", err)
 	}
 
-	bonuskey.PeerAddr = string(h.ID())
+	bonuskey.PeerAddr = h.ID().String()
 
 	peerRegistry := newPeerRegistry()
 	s := &Service{
