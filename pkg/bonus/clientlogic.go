@@ -52,8 +52,6 @@ func (slf *MyTcpProcessor) HeartbeatRsp(session *network.Session, msg proto.Mess
 
 func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Message) {
 	res := msg.(*message.EmitCheque)
-	//log.Info("%+v", res)
-
 	signedCheque := &chequebook.SignedCheque{}
 	err := json.Unmarshal(res.Cheque, signedCheque)
 	if err != nil {

@@ -22,5 +22,7 @@ func StartBonus(logger logging.Logger) {
 	clientProcessor.RegisterMsg(uint16(message.CSID_ID_EmitCheque), "EmitCheque", clientProcessor.EmitCheque)
 
 	pClient := network.NewTCPClient(svrAddr, clientProcessor)
+	pClient.Pingpong = clientProcessor.Heartbeat
+	pClient.PingpongInterval = 15
 	go pClient.Start()
 }
