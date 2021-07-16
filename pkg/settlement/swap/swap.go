@@ -115,6 +115,36 @@ func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque 
 	return s.accounting.NotifyPaymentReceived(peer, amount)
 }
 
+func (s *Service) ReceiveBonusCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) (err error) {
+	// check this is the same chequebook for this peer as previously
+	expectedChequebook, known, err := s.addressbook.Chequebook(peer)
+	if err != nil {
+		return err
+	}
+	if known && expectedChequebook != cheque.Chequebook {
+		return ErrWrongChequebook
+	}
+
+	receivedAmount, err := s.chequeStore.ReceiveBonusCheque(ctx, cheque)
+	if err != nil {
+		s.metrics.ChequesRejected.Inc()
+		return fmt.Errorf("rejecting cheque: %w", err)
+	}
+
+	if !known {
+		err = s.addressbook.PutChequebook(peer, cheque.Chequebook)
+		if err != nil {
+			return err
+		}
+	}
+
+	tot, _ := big.NewFloat(0).SetInt(receivedAmount).Float64()
+	s.metrics.TotalReceived.Add(tot)
+	s.metrics.ChequesReceived.Inc()
+
+	return s.accounting.NotifyPaymentReceived(peer, receivedAmount)
+}
+
 // Pay initiates a payment to the given peer
 func (s *Service) Pay(ctx context.Context, peer swarm.Address, amount *big.Int) {
 	var err error

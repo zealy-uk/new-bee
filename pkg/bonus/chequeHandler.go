@@ -7,13 +7,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequebook"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"math/big"
-)
-
-// todo: to tune the values
-var (
-	exchangeRate = big.NewInt(1)
-	deduction = big.NewInt(0)
 )
 
 type chequeHandler struct {
@@ -38,5 +31,5 @@ func (c *chequeHandler) handleReceivCheque(msg proto.Message) error  {
 		return err
 	}
 
-	return c.swap.ReceiveCheque(c.p2pCtx, c.peer, signedCheck, exchangeRate, deduction)
+	return c.swap.ReceiveBonusCheque(c.p2pCtx, c.peer, signedCheck)
 }
