@@ -1,15 +1,23 @@
 package bonus
 
 import (
+	"context"
 	"fmt"
-	"github.com/newswarm-lab/new-bee/pkg/storage"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/settlement/swap"
+	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"sync"
 	"time"
 )
 
 type Bonus struct {
-	peerID  string
-	ethAdrr string
+	peerIDStr  string
+	ethAdrrStr string
+	beneficiaryStr string
+
+	peer swarm.Address
+	ethAdrr common.Address
+	beneficiary common.Address
 
 	closeCh closeCh
 	wg      *sync.WaitGroup
@@ -25,10 +33,13 @@ type Bonus struct {
 	dialTimeout   time.Duration
 	pingTimeout   time.Duration
 
-	stateStorer storage.StateStorer
+	p2pCtx context.Context
+	swap swap.Service
+
+	chequeHandler *chequeHandler
 }
 
-func New(peerID, ethAdrr string, storer storage.StateStorer) (*Bonus, error) {
+func New(p2pCtx context.Context, swap swap.Service, peer swarm.Address, ethAdrr, beneficiary common.Address) (*Bonus, error) {
 	wg := &sync.WaitGroup{}
 
 	hbWriteCh := make(chan *writeMsg)
@@ -45,10 +56,17 @@ func New(peerID, ethAdrr string, storer storage.StateStorer) (*Bonus, error) {
 	}
 
 	hb := newHeartbeater(activeSession, hbWriteCh, hbReadCh)
+	ch := newChequeHanler(p2pCtx, peer, swap)
+
 
 	b := &Bonus{
-		peerID:  peerID,
+		peerIDStr:  peer.String(),
+		ethAdrrStr: ethAdrr.String(),
+		beneficiaryStr: beneficiary.String(),
+
+		peer: peer,
 		ethAdrr: ethAdrr,
+		beneficiary: beneficiary,
 
 		closeCh: make(chan struct{}),
 		wg:      wg,
@@ -63,10 +81,11 @@ func New(peerID, ethAdrr string, storer storage.StateStorer) (*Bonus, error) {
 		dialTimeout:   dialTimeout,
 		pingTimeout:   pingTimeout,
 
-		stateStorer: storer,
-	}
+		p2pCtx: p2pCtx,
+		swap: swap,
 
-	initStateStorer(b.stateStorer)
+		chequeHandler: ch,
+	}
 
 	go b.serveHeartbeater()
 
@@ -78,6 +97,7 @@ func (b *Bonus) serveHeartbeater() {
 	defer b.wg.Done()
 
 	var hbErr error
+	ch := b.chequeHandler
 
 	ticker := time.NewTicker(time.Second * 15)
 	defer ticker.Stop()
@@ -92,13 +112,19 @@ func (b *Bonus) serveHeartbeater() {
 				break
 			}
 			fmt.Printf("heartbeater received CSID %v message: %v\n", readMsg.msg.id, readMsg.msg.msg)
+
+			// todo: add more logic to deal with more kinds of message.
+			if err := ch.handleReceivCheque(readMsg.msg.msg); err != nil {
+				fmt.Printf("Failed to received cheque to swap service: %v\n", readMsg.msg.msg)
+			}
 		case t := <-ticker.C:
 			fmt.Println("Current time: ", t)
 			msg := &message{
 				id: CSID_ID_Heartbeat,
 				msg: &Heartbeat{
-					Peer:    b.peerID,
-					EthAddr: b.ethAdrr,
+					Peer:    b.peerIDStr,
+					EthAddr: b.ethAdrrStr,
+					ChequebookAddr: b.beneficiaryStr,
 				},
 			}
 
