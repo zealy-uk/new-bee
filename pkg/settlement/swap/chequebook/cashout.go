@@ -38,6 +38,7 @@ type cashoutService struct {
 	backend            transaction.Backend
 	transactionService transaction.Service
 	chequeStore        ChequeStore
+	bonusChequeStore	*BonousChequeStore
 }
 
 // LastCashout contains information about the last cashout
@@ -84,23 +85,21 @@ func NewCashoutService(
 	store storage.StateStorer,
 	backend transaction.Backend,
 	transactionService transaction.Service,
-	chequeStore ChequeStore,
+	chequeStore_ ChequeStore,
+	bonusChequeStore_ *BonousChequeStore,
 ) CashoutService {
 	return &cashoutService{
 		store:              store,
 		backend:            backend,
 		transactionService: transactionService,
-		chequeStore:        chequeStore,
+		chequeStore:        chequeStore_,
+		bonusChequeStore: bonusChequeStore_,
 	}
 }
 
 // cashoutActionKey computes the store key for the last cashout action for the chequebook
 func cashoutActionKey(chequebook common.Address) string {
 	return fmt.Sprintf("swap_cashout_%x", chequebook)
-}
-
-func bonusCashoutActionKey(cheque *SignedCheque) string {
-	return fmt.Sprintf("swap_bonus_cashout_%x_%x_%x", cheque.Chequebook, cheque.Beneficiary, cheque.Id)
 }
 
 func (s *cashoutService) paidOut(ctx context.Context, chequebook, beneficiary common.Address) (*big.Int, error) {
@@ -175,15 +174,15 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 	return txHash, nil
 }
 
-
-// todo: delete bonus cheque after CashBonusCheque success.
+// CashCheque sends a cashout transaction for the earliest uncashed cheque of the chequebook
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error)  {
-	cheque, err := s.chequeStore.LastBonusCheque(chequebook)
+	chequebookAddr := chequebookT(chequebook.String())
+	_, cheque, err := s.bonusChequeStore.EarliestBonusCheque(chequebookAddr)
 	if err != nil {
 		return common.Hash{}, err
 	}
 
-	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
+	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Signature)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -206,12 +205,12 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 		return common.Hash{}, err
 	}
 
-	err = s.store.Put(bonusCashoutActionKey(cheque), &cashoutAction{
-		TxHash: txHash,
-		Cheque: *cheque,
-	})
-	if err != nil {
-		return common.Hash{}, err
+	if err = s.bonusChequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
+		return txHash, err
+	}
+
+	if err = s.bonusChequeStore.DeleteEearliestBonusCheque(chequebookAddr); err != nil {
+		return txHash, err
 	}
 
 	return txHash, nil
