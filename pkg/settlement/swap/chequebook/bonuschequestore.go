@@ -1,9 +1,17 @@
 package chequebook
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"math/big"
+)
+
+const (
+	peerPrefix                = "swap_chequebook_peer_" // copied from pkg/settlement/swap/addressbook.go
+	uncashedBonusChequePrefix = "swap_bonus_chequebook_uncashed_cheque_"
+	cashedBonusChequePrefix   = "swap_bonus_chequebook_cashed_cheque_"
 )
 
 type chequebookT string
@@ -12,10 +20,10 @@ type cashedChequeKeyT string
 type chequeTxHashT string
 
 func bonusReceivedChequeKey(cheque *SignedCheque) chequeKeyT {
-	return chequeKeyT(fmt.Sprintf("bonus_chequebook:%x_chequeid:%s_amout:%d", cheque.Chequebook, cheque.Id, cheque.Beneficiary))
+	return chequeKeyT(fmt.Sprintf("%schequebook:%x_chequeid:%s_amout:%d", uncashedBonusChequePrefix, cheque.Chequebook, cheque.Id, cheque.Beneficiary))
 }
-func bonusCashedChequeKey(cheque *SignedCheque) cashedChequeKeyT {
-	return cashedChequeKeyT(fmt.Sprintf("bonus_chequebook:%x_chequeid:%s_amout:%d_cashed", cheque.Chequebook, cheque.Id, cheque.Beneficiary))
+func bonusCashedChequeKey(cheque *SignedCheque, txHash common.Hash) cashedChequeKeyT {
+	return cashedChequeKeyT(fmt.Sprintf("%schequebook:%x_chequeid:%s_amout:%d_txHash:%s", cashedBonusChequePrefix, cheque.Chequebook, cheque.Id, cheque.Beneficiary, txHash))
 }
 
 type BonousChequeStore struct {
@@ -27,32 +35,25 @@ type BonousChequeStore struct {
 	*ChequeStoreImp
 }
 
-//// todo:
-//func NewBonusChequeStore(
-//	store storage.StateStorer,
-//	) *BonousChequeStore {
-//	return &BonousChequeStore{
-//		store: store,
-//	}
-//
-//	// todo: load bonus cheque
-//	//func (s *CheckStoreImp) loadBonusCheque() error  {
-//	//	if bonusReceivedCheque == nil {
-//	//		bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
-//	//
-//	//		iterFn := func(key, value []byte) (stop bool, err error) {
-//	//
-//	//		}
-//	//		s.store.Iterate(bonusReceivedChequePrefix, iterFn)
-//	//	}
-//	//}
-//}
-
 // NewChequeStore creates new BonousChequeStore
 func NewBonusChequeStore(cs *ChequeStoreImp) *BonousChequeStore {
-	return &BonousChequeStore{
-		ChequeStoreImp: cs,
+
+	var chequebookCache []chequebookT
+
+	if err := cs.store.Iterate(peerPrefix, func(_, value []byte) (stop bool, err error) {
+		var chequebook common.Address
+
+		if err := json.Unmarshal(value, &chequebook); err != nil {
+			return true, fmt.Errorf("invalid chequebook value %q: %w", string(value), err)
+		}
+
+		chequebookCache = append(chequebookCache, chequebookT(chequebook.String()))
+		return false, nil
+	}); err != nil {
+		panic(fmt.Errorf("iteration failed: build chequebook cache from storage: %w\n", err))
 	}
+
+
 }
 
 // earliestBonusCheque returns the earliest received but not cashed signed cheque and its corresponding key.
