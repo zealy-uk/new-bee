@@ -21,12 +21,11 @@ import (
 const (
 	// prefix for the persistence key
 	lastReceivedChequePrefix = "swap_chequebook_last_received_cheque_"
-	bonusReceivedChequePrefix = "swap_chequebook_bonus_received_cheque_"
 )
 
 var (
 	// ErrNoCheque is the error returned if there is no prior cheque for a chequebook or beneficiary.
-	ErrNoCheque = errors.New("no cheque")
+	ErrNoCheque      = errors.New("no cheque")
 	ErrNoBonusCheque = errors.New("no bonus cheque")
 	// ErrChequeNotIncreasing is the error returned if the cheque amount is the same or lower.
 	ErrChequeNotIncreasing = errors.New("cheque cumulativePayout is not increasing")
@@ -40,21 +39,20 @@ var (
 	ErrChequeValueTooLow = errors.New("cheque value lower than acceptable")
 )
 
-var bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
+//
+//var bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
 
 // ChequeStore handles the verification and storage of received cheques
 type ChequeStore interface {
 	// ReceiveCheque verifies and stores a cheque. It returns the total amount earned.
 	ReceiveCheque(ctx context.Context, cheque *SignedCheque, exchangeRate, deduction *big.Int) (*big.Int, error)
-	ReceiveBonusCheque(ctx context.Context, cheque *SignedCheque) (*big.Int, error)
 	// LastCheque returns the last cheque we received from a specific chequebook.
 	LastCheque(chequebook common.Address) (*SignedCheque, error)
-	LastBonusCheque(chequebook common.Address) (*SignedCheque, error)
 	// LastCheques returns the last received cheques from every known chequebook.
 	LastCheques() (map[common.Address]*SignedCheque, error)
 }
 
-type chequeStore struct {
+type ChequeStoreImp struct {
 	lock               sync.Mutex
 	store              storage.StateStorer
 	factory            Factory
@@ -74,7 +72,7 @@ func NewChequeStore(
 	beneficiary common.Address,
 	transactionService transaction.Service,
 	recoverChequeFunc RecoverChequeFunc) ChequeStore {
-	return &chequeStore{
+	return &ChequeStoreImp{
 		store:              store,
 		factory:            factory,
 		chaindID:           chainID,
@@ -89,12 +87,8 @@ func lastReceivedChequeKey(chequebook common.Address) string {
 	return fmt.Sprintf("%s_%x", lastReceivedChequePrefix, chequebook)
 }
 
-func bonusReceivedChequeKey(chequebook common.Address, chequeId *big.Int) string {
-	return fmt.Sprintf("%s_%x_%x", bonusReceivedChequePrefix, chequebook, chequeId)
-}
-
 // LastCheque returns the last cheque we received from a specific chequebook.
-func (s *chequeStore) LastCheque(chequebook common.Address) (*SignedCheque, error) {
+func (s *ChequeStoreImp) LastCheque(chequebook common.Address) (*SignedCheque, error) {
 	var cheque *SignedCheque
 	err := s.store.Get(lastReceivedChequeKey(chequebook), &cheque)
 	if err != nil {
@@ -107,32 +101,8 @@ func (s *chequeStore) LastCheque(chequebook common.Address) (*SignedCheque, erro
 	return cheque, nil
 }
 
-func (s *chequeStore) LastBonusCheque(chequebook common.Address) (*SignedCheque, error) {
-	if len(bonusReceivedCheque) < 1 {
-		return nil, ErrNoBonusCheque
-	}
-
-	lastBonusCheque := bonusReceivedCheque[0]
-	bonusReceivedCheque = bonusReceivedCheque[1:]
-
-	return lastBonusCheque, nil
-}
-
-// todo: load bonus cheque
-//func (s *chequeStore) loadBonusCheque() error  {
-//	if bonusReceivedCheque == nil {
-//		bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
-//
-//		iterFn := func(key, value []byte) (stop bool, err error) {
-//
-//		}
-//		s.store.Iterate(bonusReceivedChequePrefix, iterFn)
-//	}
-//}
-
-
 // ReceiveCheque verifies and stores a cheque. It returns the totam amount earned.
-func (s *chequeStore) ReceiveCheque(ctx context.Context, cheque *SignedCheque, exchangeRate, deduction *big.Int) (*big.Int, error) {
+func (s *ChequeStoreImp) ReceiveCheque(ctx context.Context, cheque *SignedCheque, exchangeRate, deduction *big.Int) (*big.Int, error) {
 	// verify we are the beneficiary
 	if cheque.Beneficiary != s.beneficiary {
 		return nil, ErrWrongBeneficiary
@@ -220,15 +190,6 @@ func (s *chequeStore) ReceiveCheque(ctx context.Context, cheque *SignedCheque, e
 	return amount, nil
 }
 
-func (s *chequeStore)  ReceiveBonusCheque(ctx context.Context, cheque *SignedCheque) (*big.Int, error) {
-		if err := s.store.Put(bonusReceivedChequeKey(cheque.Chequebook, cheque.Id), cheque); err != nil {
-			return nil, err
-		}
-	bonusReceivedCheque = append(bonusReceivedCheque, cheque)
-	fmt.Printf("Succesfully received and appended bonus cheque from %v: %v\n", cheque.Chequebook, cheque.CumulativePayout)
-	return cheque.CumulativePayout, nil
-}
-
 // RecoverCheque recovers the issuer ethereum address from a signed cheque
 func RecoverCheque(cheque *SignedCheque, chaindID int64) (common.Address, error) {
 	eip712Data := eip712DataForCheque(&cheque.Cheque, chaindID)
@@ -260,7 +221,7 @@ func keyChequebook(key []byte, prefix string) (chequebook common.Address, err er
 }
 
 // LastCheques returns the last received cheques from every known chequebook.
-func (s *chequeStore) LastCheques() (map[common.Address]*SignedCheque, error) {
+func (s *ChequeStoreImp) LastCheques() (map[common.Address]*SignedCheque, error) {
 	result := make(map[common.Address]*SignedCheque)
 	err := s.store.Iterate(lastReceivedChequePrefix, func(key, val []byte) (stop bool, err error) {
 		addr, err := keyChequebook(key, lastReceivedChequePrefix+"_")
