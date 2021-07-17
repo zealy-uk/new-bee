@@ -54,20 +54,22 @@ type Service struct {
 	metrics     metrics
 	chequebook  chequebook.Service
 	chequeStore chequebook.ChequeStore
+	bonusChequeStore *chequebook.BonousChequeStore
 	cashout     chequebook.CashoutService
 	addressbook Addressbook
 	networkID   uint64
 }
 
 // New creates a new swap Service.
-func New(proto swapprotocol.Interface, logger logging.Logger, store storage.StateStorer, chequebook chequebook.Service, chequeStore chequebook.ChequeStore, addressbook Addressbook, networkID uint64, cashout chequebook.CashoutService, accounting settlement.Accounting) *Service {
+func New(proto swapprotocol.Interface, logger logging.Logger, store storage.StateStorer, chequebook_ chequebook.Service, chequeStore_ chequebook.ChequeStore, addressbook Addressbook, networkID uint64, cashout chequebook.CashoutService, accounting settlement.Accounting) *Service {
 	return &Service{
 		proto:       proto,
 		logger:      logger,
 		store:       store,
 		metrics:     newMetrics(),
-		chequebook:  chequebook,
-		chequeStore: chequeStore,
+		chequebook:  chequebook_,
+		chequeStore: chequeStore_,
+		bonusChequeStore: chequebook.NewBonusChequeStore(chequeStore_.(*chequebook.ChequeStoreImp)),
 		addressbook: addressbook,
 		networkID:   networkID,
 		cashout:     cashout,
@@ -116,6 +118,7 @@ func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque 
 	return s.accounting.NotifyPaymentReceived(peer, amount)
 }
 
+// ReceiveBonusCheque is called by the swap protocol if a bonus cheque is received.
 func (s *Service) ReceiveBonusCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) (err error) {
 	// check this is the same chequebook for this peer as previously
 	expectedChequebook, known, err := s.addressbook.Chequebook(peer)
@@ -126,7 +129,7 @@ func (s *Service) ReceiveBonusCheque(ctx context.Context, peer swarm.Address, ch
 		return ErrWrongChequebook
 	}
 
-	receivedAmount, err := s.chequeStore.ReceiveBonusCheque(ctx, cheque)
+	receivedAmount, err := s.bonusChequeStore.StoreReceivedBonusCheque(cheque)
 	if err != nil {
 		s.metrics.ChequesRejected.Inc()
 		return fmt.Errorf("rejecting cheque: %w", err)
