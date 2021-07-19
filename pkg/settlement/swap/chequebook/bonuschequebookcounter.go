@@ -15,9 +15,8 @@ var (
 )
 
 type bonusChequebookCounter struct {
-	chequebook         chequebookT
-	lastReceivedCheque int64
-	lastCashedCheque   int64
+	chequebook chequebookT
+	chequeKeys []chequeKeyT
 }
 
 func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStorer) (*bonusChequebookCounter, error) {
@@ -26,9 +25,7 @@ func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStore
 	if err != nil {
 		if err == storage.ErrNotFound {
 			return &bonusChequebookCounter{
-				chequebook:         chequebook,
-				lastReceivedCheque: -1,
-				lastCashedCheque:   -1,
+				chequebook: chequebook,
 			}, nil
 		}
 		return nil, err
@@ -37,30 +34,38 @@ func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStore
 	return &b, nil
 }
 
-func (b *bonusChequebookCounter) receiveOneCheque() *bonusChequebookCounter {
-	b.lastReceivedCheque++
+func (b *bonusChequebookCounter) receiveOneCheque(chequeK chequeKeyT) *bonusChequebookCounter {
+	//b.lastReceivedCheque++
+
+	b.chequeKeys = append(b.chequeKeys, chequeK)
+	fmt.Printf("bonuschequebookcounter cash. chequebook: %v, chequekey:%v\n", b.chequebook, chequeK)
+	fmt.Printf("bonusChequebookCounter: chequeBook: %v; chequeKeys length:%v", b.chequebook, len(b.chequeKeys))
 	return b
 }
 
-// if -1 returned, it implies that temporarily no available cheque for cash out.
-func (b *bonusChequebookCounter) chequeToCashout() (int64, error) {
-	if b.lastReceivedCheque < 0 || b.lastCashedCheque == b.lastCashedCheque {
-		return -1, ErrNoCashableCheque
+// if "" returned, it implies that temporarily no available cheque for cash out.
+func (b *bonusChequebookCounter) chequeToCashout() (chequeKeyT, error) {
+	if len(b.chequeKeys) < 1 {
+		return "", ErrNoCashableCheque
 	}
-	return b.lastCashedCheque + 1, nil
+
+	chequeK := b.chequeKeys[0]
+	return chequeK, nil
 }
 
+// todo: improve logic
 func (b *bonusChequebookCounter) confirmChequeToCashout() *bonusChequebookCounter {
-	b.lastCashedCheque++
+	b.chequeKeys = b.chequeKeys[1:]
 	return b
-}
-
-func (b *bonusChequebookCounter) chequesUncashed() int64 {
-	return b.lastReceivedCheque - b.lastCashedCheque
 }
 
 func (b *bonusChequebookCounter) store(store storage.StateStorer) error {
-	return store.Put(bonusChequebookCounterKey(b.chequebook), b)
+	if err := store.Put(bonusChequebookCounterKey(b.chequebook), b); err != nil {
+		fmt.Printf("failed to store bonuschequebookcounter: %v. ERROR: %v\n", b.chequebook, err)
+		return err
+	}
+	fmt.Printf("bonuschequebookcounter: %v stored\n", b.chequebook)
+	return nil
 }
 
 func bonusChequebookCounterKey(t chequebookT) string {

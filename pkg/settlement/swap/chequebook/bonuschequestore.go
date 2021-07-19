@@ -87,16 +87,14 @@ func (r *BonousChequeStore) ChequeToCashout(chequebook chequebookT) (*SignedCheq
 		return nil, err
 	}
 
-	chequeId, err := chequebookCounter.chequeToCashout()
+	chequeK, err := chequebookCounter.chequeToCashout()
 	if err != nil {
 		return nil, err
 	}
 
-	chequeKey := bonusReceivedChequeKey(chequebook, chequeId)
-
 	var cheque SignedCheque
 
-	if err := r.store.Get(string(chequeKey), &cheque); err != nil {
+	if err := r.store.Get(string(chequeK), &cheque); err != nil {
 		return nil, err
 	}
 
@@ -146,7 +144,7 @@ func (r *BonousChequeStore) StoreReceivedBonusCheque(cheque *SignedCheque) (*big
 		return nil, err
 	}
 
-	if err := chequebookCounter.receiveOneCheque().store(r.store); err != nil {
+	if err := chequebookCounter.receiveOneCheque(receivedChequeKey).store(r.store); err != nil {
 		return nil, err
 	}
 
