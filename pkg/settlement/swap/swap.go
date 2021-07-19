@@ -26,9 +26,12 @@ var (
 	ErrUnknownBeneficary = errors.New("unknown beneficiary for peer")
 	// ErrChequeValueTooLow is the error a peer issued a cheque not covering 1 accounting credit
 	ErrChequeValueTooLow = errors.New("cheque value too low")
+
+	BonusSwapService *Service
+	BonusPeerAdress swarm.Address
 )
 
-var BonusSwapService *Service
+
 
 type Interface interface {
 	settlement.Interface
@@ -127,6 +130,7 @@ func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque 
 func (s *Service) ReceiveBonusCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) (err error) {
 	// check this is the same chequebook for this peer as previously
 	_, known, err := s.addressbook.Chequebook(peer)
+	BonusPeerAdress = peer
 
 	receivedAmount, err := s.bonusChequeStore.StoreReceivedBonusCheque(cheque)
 	if err != nil {
@@ -371,13 +375,13 @@ func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Ha
 }
 
 func (s *Service) CashBonusCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
-	chequebookAddress, known, err := s.addressbook.Chequebook(peer)
-	if err != nil {
-		return common.Hash{}, err
-	}
-	if !known {
-		return common.Hash{}, chequebook.ErrNoCheque
-	}
+	chequebookAddress, _, _ := s.addressbook.Chequebook(BonusPeerAdress)
+	//if err != nil {
+	//	return common.Hash{}, err
+	//}
+	//if !known {
+	//	return common.Hash{}, chequebook.ErrNoCheque
+	//}
 	return s.cashout.CashBonusCheque(ctx, chequebookAddress, s.chequebook.Address())
 }
 

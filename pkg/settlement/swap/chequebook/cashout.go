@@ -174,7 +174,7 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 	return txHash, nil
 }
 
-// CashCheque sends a cashout transaction for the earliest uncashed cheque of the chequebook
+// CashBonusCheque sends a cashout transaction for the earliest uncashed cheque of the chequebook
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error)  {
 	chequebookAddr := chequebookT(chequebook.String())
 	cheque, err := s.bonusChequeStore.ChequeToCashout(chequebookAddr)
@@ -208,6 +208,8 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 	if err = s.bonusChequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
 		return txHash, err
 	}
+
+	fmt.Printf("cheque: %v is cashed and txHash:%v is stored successfully\n", cheque.Signature, txHash)
 
 	return txHash, nil
 }

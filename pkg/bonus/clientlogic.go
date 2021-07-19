@@ -20,6 +20,7 @@ type MyTcpProcessor struct {
 	network.DefTcpProcessor
 }
 
+
 func (slf *MyTcpProcessor) OnConnectSucc(session *network.Session) {
 	session.SetWritable(false)
 	log.Info("client connect,session:%d[%s]", session.GetID(), session.RemoteAddr().String())
@@ -73,3 +74,4 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 	}
 	log.Info("swap bonus cheque received and stored successfully: chequebook:%s, chequeId:%s", signedCheque.Chequebook, signedCheque.Id)
 }
+
