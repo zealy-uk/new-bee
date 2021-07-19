@@ -16,9 +16,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/node"
 )
 
-//var bonusSwapService = node.BonusSwapService
-//var bonusAddressBook = node.BonusAddressBook
-
 type MyTcpProcessor struct {
 	network.DefTcpProcessor
 }
@@ -70,6 +67,7 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 	log.Info("recv Cheque Signature:%x", signedCheque.Signature)
 
 	peer := swarm.MustParseHexAddress(signedCheque.Chequebook.String())
+
 	if err := node.BonusSwapService.ReceiveBonusCheque(nil, peer, signedCheque); err != nil {
 		log.Error("failed to finally receive and store swap bonus cheque: chequebook:%s, chequeId:%s. ERROR: %w", signedCheque.Chequebook, signedCheque.Id, err)
 	}
