@@ -50,7 +50,7 @@ func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Mess
 
 func (slf *MyTcpProcessor) HeartbeatRsp(session *network.Session, msg proto.Message) {
 	res := msg.(*message.HeartbeatRsp)
-	log.Info("recv HeartbeatRsp,%+v", res)
+	log.Info("session:%d recv HeartbeatRsp,%+v", session.GetID(), res)
 }
 
 func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Message) {
