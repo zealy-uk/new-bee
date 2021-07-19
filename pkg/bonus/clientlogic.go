@@ -61,5 +61,5 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 		log.Error("SignedCheque Unmarshal error:%s", err.Error())
 		return
 	}
-	log.Info("recv SignedCheque,%+v", signedCheque)
+	log.Info("recv SignedCheque:%+v", signedCheque)
 }

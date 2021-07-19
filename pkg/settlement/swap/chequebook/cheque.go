@@ -20,6 +20,7 @@ type Cheque struct {
 	Chequebook       common.Address
 	Beneficiary      common.Address
 	CumulativePayout *big.Int
+	Id               *big.Int
 }
 
 // SignedCheque represents a cheque together with its signature
