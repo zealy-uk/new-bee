@@ -10,7 +10,7 @@ p2p-addr: :11634
 network-id: 5
 mainnet: false
 verbosity: 5
-welcome-message: 蛙米科技-WMINFO
+welcome-message: WMINFO
 debug-api-addr: :11635
 swap-enable: true
 swap-initial-deposit: 0

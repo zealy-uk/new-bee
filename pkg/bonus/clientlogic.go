@@ -8,7 +8,7 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequebook"
 
-	msgpkg "github.com/newswarm-lab/new-bee/pkg/bonus/message"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 	"github.com/newswarm-lab/new-bee/pkg/bonus/network"
 
 	"google.golang.org/protobuf/proto"
@@ -30,12 +30,12 @@ func (slf *MyTcpProcessor) OnConnectClose(session *network.Session) {
 }
 
 func (slf *MyTcpProcessor) Heartbeat(session *network.Session) {
-	send := &msgpkg.Heartbeat{
+	send := &message.Heartbeat{
 		Peer:           bonuskey.PeerAddr,
 		EthAddr:        bonuskey.EthAddr,
 		ChequebookAddr: bonuskey.ChequebookAddr,
 	}
-	data, err := network.PutProtobufPayload(uint16(msgpkg.CSID_ID_Heartbeat), send)
+	data, err := network.PutProtobufPayload(uint16(message.CSID_ID_Heartbeat), send)
 	if err != nil {
 		log.Error("PutProtobufPayload error:%s", err.Error())
 	}
@@ -43,7 +43,7 @@ func (slf *MyTcpProcessor) Heartbeat(session *network.Session) {
 }
 
 func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Message) {
-	res := msg.(*msgpkg.CipherKeyNtf)
+	res := msg.(*message.CipherKeyNtf)
 	sCipher := network.NewRc4Cipher([]byte(res.SvrKey))
 	cCipher := network.NewRc4Cipher([]byte(res.CltKey))
 	session.SetCipher(sCipher, cCipher)
@@ -53,12 +53,12 @@ func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Mess
 }
 
 func (slf *MyTcpProcessor) HeartbeatRsp(session *network.Session, msg proto.Message) {
-	res := msg.(*msgpkg.HeartbeatRsp)
-	log.Info("recv HeartbeatRsp,%+v", res)
+	res := msg.(*message.HeartbeatRsp)
+	log.Info("session:%d recv HeartbeatRsp,%+v", session.GetID(), res)
 }
 
 func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Message) {
-	res := msg.(*msgpkg.EmitCheque)
+	res := msg.(*message.EmitCheque)
 	signedCheque := &chequebook.SignedCheque{}
 	err := json.Unmarshal(res.Cheque, signedCheque)
 	if err != nil {

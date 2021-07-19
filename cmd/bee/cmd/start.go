@@ -83,7 +83,7 @@ func (c *command) initStartCmd() (err error) {
 			}
 
 			beeASCII := `
-Welcome to Swarm.... Bzzz Bzzzz Bzzzz
+Welcome to newswarm-lab.... Fbzz FBzz FBzz
                 \     /
             \    o ^ o    /
               \ (     ) /

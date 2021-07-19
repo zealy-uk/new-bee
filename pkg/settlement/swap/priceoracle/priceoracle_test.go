@@ -12,14 +12,14 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/priceoracle"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
 	transactionmock "github.com/newswarm-lab/new-bee/pkg/transaction/mock"
-	"github.com/ethersphere/go-price-oracle-abi/priceoracleabi"
 )
 
 var (
-	priceOracleABI = transaction.ParseABIUnchecked(priceoracleabi.PriceOracleABIv0_1_0)
+	priceOracleABI = transaction.ParseABIUnchecked(nswabi.PriceOracleABIv0_1_0)
 )
 
 func TestExchangeGetPrice(t *testing.T) {

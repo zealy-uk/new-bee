@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
-	"github.com/ethersphere/go-price-oracle-abi/priceoracleabi"
 )
 
 var (
@@ -43,7 +43,7 @@ type Service interface {
 }
 
 var (
-	priceOracleABI = transaction.ParseABIUnchecked(priceoracleabi.PriceOracleABIv0_1_0)
+	priceOracleABI = transaction.ParseABIUnchecked(nswabi.PriceOracleABIv0_1_0)
 )
 
 func New(logger logging.Logger, priceOracleAddress common.Address, transactionService transaction.Service, timeDivisor int64) Service {
