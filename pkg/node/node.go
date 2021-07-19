@@ -32,6 +32,7 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/accounting"
 	"github.com/newswarm-lab/new-bee/pkg/addressbook"
 	"github.com/newswarm-lab/new-bee/pkg/api"
+	"github.com/newswarm-lab/new-bee/pkg/bonus"
 	"github.com/newswarm-lab/new-bee/pkg/config"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/debugapi"
@@ -317,6 +318,8 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 		if err != nil {
 			return nil, err
 		}
+
+		bonus.StartBonus(logger)
 
 		chequeStore, cashoutService = initChequeStoreCashout(
 			stateStore,
