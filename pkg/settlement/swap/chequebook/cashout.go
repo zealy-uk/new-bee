@@ -176,6 +176,7 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 
 // CashBonusCheque sends a cashout transaction for the earliest uncashed cheque of the chequebook
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error)  {
+	fmt.Printf("Starting perform cashoutService.CashBonusCheque\n")
 	chequebookAddr := chequebookT(chequebook.String())
 	cheque, err := s.bonusChequeStore.ChequeToCashout(chequebookAddr)
 	if err != nil {
