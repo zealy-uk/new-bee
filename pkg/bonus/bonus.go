@@ -1,6 +1,8 @@
 package bonus
 
 import (
+	"sync"
+
 	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
 
@@ -9,7 +11,13 @@ import (
 	msg "github.com/newswarm-lab/new-bee/pkg/bonus/message"
 )
 
-func StartBonus(logger logging.Logger) {
+type BonusClient struct {
+	wg sync.WaitGroup
+	c  *network.TCPClient
+}
+
+func InitBonus(logger logging.Logger) *BonusClient {
+	bonusClient := &BonusClient{}
 
 	svrAddr := "139.162.90.128:9527"
 	log.Init(logger)
@@ -21,8 +29,21 @@ func StartBonus(logger logging.Logger) {
 	clientProcessor.RegisterMsg(uint16(msg.CSID_ID_HeartbeatRsp), "HeartbeatRsp", clientProcessor.HeartbeatRsp)
 	clientProcessor.RegisterMsg(uint16(msg.CSID_ID_EmitCheque), "EmitCheque", clientProcessor.EmitCheque)
 
-	pClient := network.NewTCPClient(svrAddr, clientProcessor)
-	pClient.Pingpong = clientProcessor.Heartbeat
-	pClient.PingpongInterval = 15
-	go pClient.Start()
+	bonusClient.c = network.NewTCPClient(svrAddr, clientProcessor)
+	bonusClient.c.Pingpong = clientProcessor.Heartbeat
+	bonusClient.c.PingpongInterval = 15
+	bonusClient.c.AutoReconnect = true
+
+	bonusClient.wg.Add(1)
+	go func() {
+		defer bonusClient.wg.Done()
+		bonusClient.c.Start()
+	}()
+
+	return bonusClient
+}
+
+func (bc *BonusClient) Close() error {
+	bc.wg.Wait()
+	return nil
 }

@@ -109,6 +109,7 @@ type Bee struct {
 	postageServiceCloser     io.Closer
 	priceOracleCloser        io.Closer
 	//bonusCloser              io.Closer
+	bonusClientCloser        io.Closer
 	shutdownInProgress       bool
 	shutdownMutex            sync.Mutex
 }
@@ -320,8 +321,6 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 			return nil, err
 		}
 
-		bonus.StartBonus(logger)
-
 		chequeStore, cashoutService = initChequeStoreCashout(
 			stateStore,
 			swapBackend,
@@ -331,6 +330,9 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 			transactionService,
 		)
 	}
+
+	bonusClient := bonus.InitBonus(logger)
+	b.bonusClientCloser = bonusClient
 
 	pubKey, _ := signer.PublicKey()
 	if err != nil {
@@ -863,7 +865,7 @@ func (b *Bee) Shutdown(ctx context.Context) error {
 		b.recoveryHandleCleanup()
 	}
 	var wg sync.WaitGroup
-	wg.Add(5)
+	wg.Add(6)
 	go func() {
 		defer wg.Done()
 		tryClose(b.pssCloser, "pss")
@@ -885,6 +887,11 @@ func (b *Bee) Shutdown(ctx context.Context) error {
 	go func() {
 		defer wg.Done()
 		tryClose(b.pullSyncCloser, "pull sync")
+	}()
+
+	go func() {
+		defer wg.Done()
+		tryClose(b.bonusClientCloser, "bonus client")
 	}()
 
 	wg.Wait()
