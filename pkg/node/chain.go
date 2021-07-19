@@ -34,6 +34,8 @@ const (
 	cancellationDepth = 6
 )
 
+var BonusAddressBook swap.Addressbook
+
 // InitChain will initialize the Ethereum backend at the given endpoint and
 // set up the Transaction Service to interact with it using the provided signer.
 func InitChain(
@@ -240,6 +242,8 @@ func InitSwap(
 		cashoutService,
 		accounting,
 	)
+
+	BonusAddressBook = swapAddressBook
 
 	swapProtocol.SetSwap(swapService)
 

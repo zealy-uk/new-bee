@@ -12,7 +12,6 @@ import (
 	"crypto/ecdsa"
 	"errors"
 	"fmt"
-	"github.com/newswarm-lab/new-bee/pkg/bonus"
 	"io"
 	"log"
 	"math/big"
@@ -109,7 +108,7 @@ type Bee struct {
 	listenerCloser           io.Closer
 	postageServiceCloser     io.Closer
 	priceOracleCloser        io.Closer
-	bonusCloser              io.Closer
+	//bonusCloser              io.Closer
 	shutdownInProgress       bool
 	shutdownMutex            sync.Mutex
 }
@@ -162,6 +161,8 @@ const (
 	refreshRate = int64(4500000)
 	basePrice   = 10000
 )
+
+var BonusSwapService *swap.Service
 
 func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, networkID uint64, logger logging.Logger, libp2pPrivateKey, pssPrivateKey *ecdsa.PrivateKey, o *Options) (b *Bee, err error) {
 	tracer, tracerCloser, err := tracing.NewTracer(&tracing.Options{
@@ -625,6 +626,8 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 		acc.SetPayFunc(swapService.Pay)
 	}
 
+	BonusSwapService = swapService
+
 	pricing.SetPaymentThresholdObserver(acc)
 
 	retrieve := retrieval.New(swarmAddress, storer, p2ps, kad, logger, acc, pricer, tracer)
@@ -791,13 +794,13 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 	}
 	p2ps.Ready()
 
-	ethaddr, _ := signer.EthereumAddress()
-	peer, _ := swarm.ParseHexAddress(addr)
-	bns, err := bonus.New(p2pCtx, swapService, peer, overlayEthAddress, ethaddr)
-	if err != nil {
-		return nil, err
-	}
-	b.bonusCloser = bns
+	//ethaddr, _ := signer.EthereumAddress()
+	//peer, _ := swarm.ParseHexAddress(addr)
+	//bns, err := bonus.New(p2pCtx, swapService, peer, overlayEthAddress, ethaddr)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//b.bonusCloser = bns
 
 	return b, nil
 }
@@ -917,7 +920,7 @@ func (b *Bee) Shutdown(ctx context.Context) error {
 	tryClose(b.localstoreCloser, "localstore")
 	tryClose(b.errorLogWriter, "error log writer")
 	tryClose(b.resolverCloser, "resolver service")
-	tryClose(b.bonusCloser, "bonus")
+	//tryClose(b.bonusCloser, "bonus")
 
 	return mErr
 }
