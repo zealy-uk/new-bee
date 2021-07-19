@@ -21,8 +21,9 @@ message Ack {
 }
 
 message SynAck {
-    Syn Syn = 1;
-    Ack Ack = 2;
+    sfixed32 resv = 1;
+    Syn Syn = 2;
+    Ack Ack = 3;
 }
 
 message BzzAddress {

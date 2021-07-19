@@ -11,17 +11,17 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequebook"
 	chequestoremock "github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequestore/mock"
 	storemock "github.com/newswarm-lab/new-bee/pkg/statestore/mock"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
 	"github.com/newswarm-lab/new-bee/pkg/transaction/backendmock"
 	transactionmock "github.com/newswarm-lab/new-bee/pkg/transaction/mock"
-	"github.com/ethersphere/go-sw3-abi/sw3abi"
 )
 
 var (
-	chequebookABI          = transaction.ParseABIUnchecked(sw3abi.ERC20SimpleSwapABIv0_3_1)
+	chequebookABI          = transaction.ParseABIUnchecked(nswabi.RewardChequeBookABIv0_1_0)
 	chequeCashedEventType  = chequebookABI.Events["ChequeCashed"]
 	chequeBouncedEventType = chequebookABI.Events["ChequeBounced"]
 )

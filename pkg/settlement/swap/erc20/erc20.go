@@ -11,13 +11,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
-	"github.com/ethersphere/go-sw3-abi/sw3abi"
 )
 
 var (
-	erc20ABI     = transaction.ParseABIUnchecked(sw3abi.ERC20ABIv0_3_1)
+	erc20ABI     = transaction.ParseABIUnchecked(nswabi.ERC20ABIV0_1_0)
 	errDecodeABI = errors.New("could not decode abi data")
 )
 

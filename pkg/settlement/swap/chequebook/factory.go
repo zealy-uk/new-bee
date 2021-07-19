@@ -12,9 +12,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
-	"github.com/ethersphere/go-sw3-abi/sw3abi"
 	"golang.org/x/net/context"
 )
 
@@ -23,7 +23,7 @@ var (
 	ErrNotDeployedByFactory = errors.New("chequebook not deployed by factory")
 	errDecodeABI            = errors.New("could not decode abi data")
 
-	factoryABI                  = transaction.ParseABIUnchecked(sw3abi.SimpleSwapFactoryABIv0_4_0)
+	factoryABI                  = transaction.ParseABIUnchecked(nswabi.CheckBookFactoryABIv0_1_0)
 	simpleSwapDeployedEventType = factoryABI.Events["SimpleSwapDeployed"]
 )
 
@@ -53,12 +53,12 @@ type simpleSwapDeployedEvent struct {
 }
 
 // the bytecode of factories which can be used for deployment
-var currentDeployVersion []byte = common.FromHex(sw3abi.SimpleSwapFactoryDeployedBinv0_4_0)
+var currentDeployVersion []byte = common.FromHex(nswabi.CheckBookFactoryDeployedBinv0_1_0)
 
 // the bytecode of factories from which we accept chequebooks
 var supportedVersions = [][]byte{
 	currentDeployVersion,
-	common.FromHex(sw3abi.SimpleSwapFactoryDeployedBinv0_3_1),
+	common.FromHex(nswabi.CheckBookFactoryDeployedBinv0_1_0),
 }
 
 // NewFactory creates a new factory service for the provided factory contract.
@@ -73,7 +73,7 @@ func NewFactory(backend transaction.Backend, transactionService transaction.Serv
 
 // Deploy deploys a new chequebook and returns once the transaction has been submitted.
 func (c *factory) Deploy(ctx context.Context, issuer common.Address, defaultHardDepositTimeoutDuration *big.Int, nonce common.Hash) (common.Hash, error) {
-	callData, err := factoryABI.Pack("deploySimpleSwap", issuer, big.NewInt(0).Set(defaultHardDepositTimeoutDuration), nonce)
+	callData, err := factoryABI.Pack("CreateRewardChequeBook", issuer)
 	if err != nil {
 		return common.Hash{}, err
 	}
@@ -82,7 +82,7 @@ func (c *factory) Deploy(ctx context.Context, issuer common.Address, defaultHard
 		To:          &c.address,
 		Data:        callData,
 		GasPrice:    sctx.GetGasPrice(ctx),
-		GasLimit:    175000,
+		GasLimit:    1750000,
 		Value:       big.NewInt(0),
 		Description: "chequebook deployment",
 	}
@@ -119,7 +119,8 @@ func (c *factory) VerifyBytecode(ctx context.Context) (err error) {
 	}
 
 	if !bytes.Equal(code, currentDeployVersion) {
-		return ErrInvalidFactory
+		return fmt.Errorf("VerifyBytecode error: code:%x\ncurrentDeployVersion: %x", code, currentDeployVersion)
+		//return ErrInvalidFactory
 	}
 
 LOOP:

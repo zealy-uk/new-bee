@@ -4,8 +4,9 @@
 package pb
 
 import (
+	encoding_binary "encoding/binary"
 	fmt "fmt"
-	proto "github.com/gogo/protobuf/proto"
+	proto "github.com/golang/protobuf/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
@@ -20,10 +21,13 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Syn struct {
-	ObservedUnderlay []byte `protobuf:"bytes,1,opt,name=ObservedUnderlay,proto3" json:"ObservedUnderlay,omitempty"`
+	ObservedUnderlay     []byte   `protobuf:"bytes,1,opt,name=ObservedUnderlay,proto3" json:"ObservedUnderlay,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Syn) Reset()         { *m = Syn{} }
@@ -67,11 +71,14 @@ func (m *Syn) GetObservedUnderlay() []byte {
 }
 
 type Ack struct {
-	Address        *BzzAddress `protobuf:"bytes,1,opt,name=Address,proto3" json:"Address,omitempty"`
-	NetworkID      uint64      `protobuf:"varint,2,opt,name=NetworkID,proto3" json:"NetworkID,omitempty"`
-	FullNode       bool        `protobuf:"varint,3,opt,name=FullNode,proto3" json:"FullNode,omitempty"`
-	Transaction    []byte      `protobuf:"bytes,4,opt,name=Transaction,proto3" json:"Transaction,omitempty"`
-	WelcomeMessage string      `protobuf:"bytes,99,opt,name=WelcomeMessage,proto3" json:"WelcomeMessage,omitempty"`
+	Address              *BzzAddress `protobuf:"bytes,1,opt,name=Address,proto3" json:"Address,omitempty"`
+	NetworkID            uint64      `protobuf:"varint,2,opt,name=NetworkID,proto3" json:"NetworkID,omitempty"`
+	FullNode             bool        `protobuf:"varint,3,opt,name=FullNode,proto3" json:"FullNode,omitempty"`
+	Transaction          []byte      `protobuf:"bytes,4,opt,name=Transaction,proto3" json:"Transaction,omitempty"`
+	WelcomeMessage       string      `protobuf:"bytes,99,opt,name=WelcomeMessage,proto3" json:"WelcomeMessage,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
 func (m *Ack) Reset()         { *m = Ack{} }
@@ -143,8 +150,12 @@ func (m *Ack) GetWelcomeMessage() string {
 }
 
 type SynAck struct {
-	Syn *Syn `protobuf:"bytes,1,opt,name=Syn,proto3" json:"Syn,omitempty"`
-	Ack *Ack `protobuf:"bytes,2,opt,name=Ack,proto3" json:"Ack,omitempty"`
+	Resv                 int32    `protobuf:"fixed32,1,opt,name=resv,proto3" json:"resv,omitempty"`
+	Syn                  *Syn     `protobuf:"bytes,2,opt,name=Syn,proto3" json:"Syn,omitempty"`
+	Ack                  *Ack     `protobuf:"bytes,3,opt,name=Ack,proto3" json:"Ack,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *SynAck) Reset()         { *m = SynAck{} }
@@ -180,6 +191,13 @@ func (m *SynAck) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_SynAck proto.InternalMessageInfo
 
+func (m *SynAck) GetResv() int32 {
+	if m != nil {
+		return m.Resv
+	}
+	return 0
+}
+
 func (m *SynAck) GetSyn() *Syn {
 	if m != nil {
 		return m.Syn
@@ -195,9 +213,12 @@ func (m *SynAck) GetAck() *Ack {
 }
 
 type BzzAddress struct {
-	Underlay  []byte `protobuf:"bytes,1,opt,name=Underlay,proto3" json:"Underlay,omitempty"`
-	Signature []byte `protobuf:"bytes,2,opt,name=Signature,proto3" json:"Signature,omitempty"`
-	Overlay   []byte `protobuf:"bytes,3,opt,name=Overlay,proto3" json:"Overlay,omitempty"`
+	Underlay             []byte   `protobuf:"bytes,1,opt,name=Underlay,proto3" json:"Underlay,omitempty"`
+	Signature            []byte   `protobuf:"bytes,2,opt,name=Signature,proto3" json:"Signature,omitempty"`
+	Overlay              []byte   `protobuf:"bytes,3,opt,name=Overlay,proto3" json:"Overlay,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *BzzAddress) Reset()         { *m = BzzAddress{} }
@@ -264,28 +285,28 @@ func init() {
 func init() { proto.RegisterFile("handshake.proto", fileDescriptor_a77305914d5d202f) }
 
 var fileDescriptor_a77305914d5d202f = []byte{
-	// 324 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x91, 0xdf, 0x4a, 0xf3, 0x30,
-	0x18, 0xc6, 0x97, 0x75, 0xec, 0xcf, 0xbb, 0xb1, 0xef, 0x23, 0x20, 0x14, 0x19, 0x25, 0xf4, 0x40,
-	0x8a, 0x07, 0x13, 0xf5, 0x0a, 0x36, 0x44, 0x10, 0x74, 0x83, 0x54, 0x11, 0x3c, 0x32, 0x6b, 0xc3,
-	0x36, 0x5a, 0x93, 0x91, 0x74, 0x93, 0xee, 0x2a, 0xbc, 0x1e, 0xaf, 0xc0, 0xc3, 0x1d, 0x7a, 0x28,
-	0xdb, 0x8d, 0x48, 0xe3, 0xd6, 0xce, 0x79, 0xf8, 0xfe, 0x9e, 0x27, 0xc9, 0xf3, 0xbc, 0x81, 0x7f,
-	0x13, 0x26, 0x42, 0x3d, 0x61, 0x11, 0xef, 0xce, 0x94, 0x4c, 0x24, 0x6e, 0xe4, 0xc0, 0x3d, 0x07,
-	0xcb, 0x4f, 0x05, 0x3e, 0x85, 0xff, 0xc3, 0x91, 0xe6, 0x6a, 0xc1, 0xc3, 0x07, 0x11, 0x72, 0x15,
-	0xb3, 0xd4, 0x46, 0x04, 0x79, 0x2d, 0xfa, 0x87, 0xbb, 0xef, 0x08, 0xac, 0x5e, 0x10, 0xe1, 0x33,
-	0xa8, 0xf5, 0xc2, 0x50, 0x71, 0xad, 0x8d, 0xb5, 0x79, 0x71, 0xd4, 0x2d, 0x1e, 0xea, 0x2f, 0x97,
-	0x5b, 0x91, 0xee, 0x5c, 0xb8, 0x03, 0x8d, 0x01, 0x4f, 0x5e, 0xa5, 0x8a, 0x6e, 0xae, 0xec, 0x32,
-	0x41, 0x5e, 0x85, 0x16, 0x00, 0x1f, 0x43, 0xfd, 0x7a, 0x1e, 0xc7, 0x03, 0x19, 0x72, 0xdb, 0x22,
-	0xc8, 0xab, 0xd3, 0x7c, 0xc6, 0x04, 0x9a, 0xf7, 0x8a, 0x09, 0xcd, 0x82, 0x64, 0x2a, 0x85, 0x5d,
-	0x31, 0xc9, 0xf6, 0x11, 0x3e, 0x81, 0xf6, 0x23, 0x8f, 0x03, 0xf9, 0xc2, 0xef, 0xb8, 0xd6, 0x6c,
-	0xcc, 0xed, 0x80, 0x20, 0xaf, 0x41, 0x0f, 0xa8, 0x7b, 0x0b, 0x55, 0x3f, 0x15, 0x59, 0x7c, 0x62,
-	0x9a, 0x6f, 0xa3, 0xb7, 0xf7, 0xa2, 0xfb, 0xa9, 0xa0, 0x66, 0x29, 0xc4, 0xf4, 0x34, 0x49, 0x7f,
-	0x3b, 0x7a, 0x41, 0x44, 0x33, 0xc9, 0x7d, 0x06, 0x28, 0x8a, 0x66, 0x0d, 0x0e, 0x96, 0x97, 0xcf,
-	0x59, 0x77, 0x7f, 0x3a, 0x16, 0x2c, 0x99, 0x2b, 0x6e, 0x6e, 0x6c, 0xd1, 0x02, 0x60, 0x1b, 0x6a,
-	0xc3, 0xc5, 0xcf, 0x41, 0xcb, 0x68, 0xbb, 0xb1, 0xdf, 0xf9, 0x58, 0x3b, 0x68, 0xb5, 0x76, 0xd0,
-	0xd7, 0xda, 0x41, 0x6f, 0x1b, 0xa7, 0xb4, 0xda, 0x38, 0xa5, 0xcf, 0x8d, 0x53, 0x7a, 0x2a, 0xcf,
-	0x46, 0xa3, 0xaa, 0xf9, 0xcf, 0xcb, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd1, 0x48, 0x2c, 0x4a,
-	0xe2, 0x01, 0x00, 0x00,
+	// 327 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x64, 0x91, 0x4f, 0x4a, 0xc3, 0x40,
+	0x14, 0xc6, 0x9d, 0xa6, 0xf4, 0xcf, 0x6b, 0x69, 0x65, 0x50, 0x08, 0x22, 0x61, 0xc8, 0x42, 0x82,
+	0x8b, 0x8a, 0xf5, 0x04, 0x2d, 0x22, 0xb8, 0xb0, 0x85, 0x89, 0x22, 0xb8, 0xea, 0x34, 0x79, 0xb4,
+	0x25, 0x71, 0x52, 0x66, 0xd2, 0x4a, 0x7a, 0x12, 0xcf, 0xe2, 0x09, 0x5c, 0x7a, 0x04, 0xa9, 0x17,
+	0x91, 0x8c, 0xb6, 0xa9, 0x75, 0x97, 0xf7, 0x7b, 0x5f, 0x78, 0xdf, 0xf7, 0x0d, 0xb4, 0xa7, 0x42,
+	0x86, 0x7a, 0x2a, 0x22, 0xec, 0xcc, 0x55, 0x92, 0x26, 0xb4, 0xbe, 0x05, 0xee, 0x25, 0x58, 0x7e,
+	0x26, 0xe9, 0x39, 0x1c, 0x0e, 0xc7, 0x1a, 0xd5, 0x12, 0xc3, 0x07, 0x19, 0xa2, 0x8a, 0x45, 0x66,
+	0x13, 0x46, 0xbc, 0x26, 0xff, 0xc7, 0xdd, 0x37, 0x02, 0x56, 0x2f, 0x88, 0xe8, 0x05, 0x54, 0x7b,
+	0x61, 0xa8, 0x50, 0x6b, 0x23, 0x6d, 0x74, 0x8f, 0x3b, 0xc5, 0xa1, 0xfe, 0x6a, 0xf5, 0xbb, 0xe4,
+	0x1b, 0x15, 0x3d, 0x85, 0xfa, 0x00, 0xd3, 0x97, 0x44, 0x45, 0xb7, 0xd7, 0x76, 0x89, 0x11, 0xaf,
+	0xcc, 0x0b, 0x40, 0x4f, 0xa0, 0x76, 0xb3, 0x88, 0xe3, 0x41, 0x12, 0xa2, 0x6d, 0x31, 0xe2, 0xd5,
+	0xf8, 0x76, 0xa6, 0x0c, 0x1a, 0xf7, 0x4a, 0x48, 0x2d, 0x82, 0x74, 0x96, 0x48, 0xbb, 0x6c, 0x9c,
+	0xed, 0x22, 0x7a, 0x06, 0xad, 0x47, 0x8c, 0x83, 0xe4, 0x19, 0xef, 0x50, 0x6b, 0x31, 0x41, 0x3b,
+	0x60, 0xc4, 0xab, 0xf3, 0x3d, 0xea, 0x8e, 0xa0, 0xe2, 0x67, 0x32, 0xb7, 0x4f, 0xa1, 0xac, 0x50,
+	0x2f, 0x8d, 0xf7, 0x36, 0x37, 0xdf, 0x94, 0x99, 0x36, 0x8c, 0xb7, 0x46, 0xb7, 0xb5, 0x13, 0xc7,
+	0xcf, 0x24, 0x37, 0x45, 0x31, 0x93, 0xdd, 0x18, 0xfc, 0xab, 0xe8, 0x05, 0x11, 0xcf, 0x57, 0xee,
+	0x08, 0xa0, 0x08, 0x9f, 0xa7, 0xda, 0x2b, 0x74, 0x3b, 0xe7, 0x7d, 0xf8, 0xb3, 0x89, 0x14, 0xe9,
+	0x42, 0xa1, 0xb9, 0xd9, 0xe4, 0x05, 0xa0, 0x36, 0x54, 0x87, 0xcb, 0x9f, 0x1f, 0x2d, 0xb3, 0xdb,
+	0x8c, 0xfd, 0xa3, 0xf7, 0xb5, 0x43, 0x3e, 0xd6, 0x0e, 0xf9, 0x5c, 0x3b, 0xe4, 0xf5, 0xcb, 0x39,
+	0x78, 0x2a, 0xcd, 0xc7, 0xe3, 0x8a, 0x79, 0xdb, 0xab, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0xc6,
+	0xd3, 0x6e, 0x54, 0xee, 0x01, 0x00, 0x00,
 }
 
 func (m *Syn) Marshal() (dAtA []byte, err error) {
@@ -308,6 +329,10 @@ func (m *Syn) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if len(m.ObservedUnderlay) > 0 {
 		i -= len(m.ObservedUnderlay)
 		copy(dAtA[i:], m.ObservedUnderlay)
@@ -338,6 +363,10 @@ func (m *Ack) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if len(m.WelcomeMessage) > 0 {
 		i -= len(m.WelcomeMessage)
 		copy(dAtA[i:], m.WelcomeMessage)
@@ -404,6 +433,10 @@ func (m *SynAck) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if m.Ack != nil {
 		{
 			size, err := m.Ack.MarshalToSizedBuffer(dAtA[:i])
@@ -414,7 +447,7 @@ func (m *SynAck) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintHandshake(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x1a
 	}
 	if m.Syn != nil {
 		{
@@ -426,7 +459,13 @@ func (m *SynAck) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintHandshake(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x12
+	}
+	if m.Resv != 0 {
+		i -= 4
+		encoding_binary.LittleEndian.PutUint32(dAtA[i:], uint32(m.Resv))
+		i--
+		dAtA[i] = 0xd
 	}
 	return len(dAtA) - i, nil
 }
@@ -451,6 +490,10 @@ func (m *BzzAddress) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
 	if len(m.Overlay) > 0 {
 		i -= len(m.Overlay)
 		copy(dAtA[i:], m.Overlay)
@@ -496,6 +539,9 @@ func (m *Syn) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovHandshake(uint64(l))
 	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
 	return n
 }
 
@@ -523,6 +569,9 @@ func (m *Ack) Size() (n int) {
 	if l > 0 {
 		n += 2 + l + sovHandshake(uint64(l))
 	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
 	return n
 }
 
@@ -532,6 +581,9 @@ func (m *SynAck) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.Resv != 0 {
+		n += 5
+	}
 	if m.Syn != nil {
 		l = m.Syn.Size()
 		n += 1 + l + sovHandshake(uint64(l))
@@ -539,6 +591,9 @@ func (m *SynAck) Size() (n int) {
 	if m.Ack != nil {
 		l = m.Ack.Size()
 		n += 1 + l + sovHandshake(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -560,6 +615,9 @@ func (m *BzzAddress) Size() (n int) {
 	l = len(m.Overlay)
 	if l > 0 {
 		n += 1 + l + sovHandshake(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
 	}
 	return n
 }
@@ -639,15 +697,13 @@ func (m *Syn) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthHandshake
 			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -833,15 +889,13 @@ func (m *Ack) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthHandshake
 			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -881,6 +935,16 @@ func (m *SynAck) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 5 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Resv", wireType)
+			}
+			m.Resv = 0
+			if (iNdEx + 4) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Resv = int32(encoding_binary.LittleEndian.Uint32(dAtA[iNdEx:]))
+			iNdEx += 4
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Syn", wireType)
 			}
@@ -916,7 +980,7 @@ func (m *SynAck) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 2:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Ack", wireType)
 			}
@@ -958,15 +1022,13 @@ func (m *SynAck) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthHandshake
 			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}
@@ -1113,15 +1175,13 @@ func (m *BzzAddress) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if skippy < 0 {
-				return ErrInvalidLengthHandshake
-			}
-			if (iNdEx + skippy) < 0 {
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
 				return ErrInvalidLengthHandshake
 			}
 			if (iNdEx + skippy) > l {
 				return io.ErrUnexpectedEOF
 			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
 			iNdEx += skippy
 		}
 	}

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/bonuskey"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/erc20"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
@@ -201,6 +202,8 @@ func Init(
 
 		logger.Infof("using existing chequebook %x", chequebookAddress)
 	}
+
+	bonuskey.ChequebookAddr = chequebookAddress.String()
 
 	// regardless of how the chequebook service was initialised make sure that the chequebook is valid
 	err = chequebookFactory.VerifyChequebook(ctx, chequebookService.Address())

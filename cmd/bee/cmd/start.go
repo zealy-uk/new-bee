@@ -22,7 +22,9 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/rpc"
-	"github.com/newswarm-lab/new-bee"
+	"github.com/kardianos/service"
+	bee "github.com/newswarm-lab/new-bee"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/bonuskey"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/crypto/clef"
 	"github.com/newswarm-lab/new-bee/pkg/keystore"
@@ -31,7 +33,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/logging"
 	"github.com/newswarm-lab/new-bee/pkg/node"
 	"github.com/newswarm-lab/new-bee/pkg/resolver/multiresolver"
-	"github.com/kardianos/service"
 	"github.com/spf13/cobra"
 )
 
@@ -396,6 +397,7 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 		}
 		signer = crypto.NewDefaultSigner(swarmPrivateKey)
 		publicKey = &swarmPrivateKey.PublicKey
+
 	}
 
 	logger.Infof("swarm public key %x", crypto.EncodeSecp256k1PublicKey(publicKey))
@@ -428,6 +430,7 @@ func (c *command) configureSigner(cmd *cobra.Command, logger logging.Logger) (co
 		return nil, err
 	}
 	logger.Infof("using ethereum address %x", overlayEthAddress)
+	bonuskey.EthAddr = overlayEthAddress.String()
 
 	return &signerConfig{
 		signer:           signer,
