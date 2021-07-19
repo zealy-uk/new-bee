@@ -54,9 +54,9 @@ func (slf *MsgParser) Read(conn net.Conn) ([]byte, error) {
 	}
 
 	if slf.cipher != nil {
-		log.Trace("before cipher decrypt:%x", msgData)
+		//log.Trace("before cipher decrypt:%x", msgData)
 		msgData = slf.cipher.Decrypt(msgData)
-		log.Trace("after cipher decrypt:%x", msgData)
+		//log.Trace("after cipher decrypt:%x", msgData)
 	}
 
 	return msgData, nil
@@ -79,9 +79,9 @@ func (slf *MsgParser) Write(conn net.Conn, msgData []byte) error {
 
 	//encrypt
 	if slf.cipher != nil {
-		log.Trace("before cipher encrypt:%x", msgData)
+		//log.Trace("before cipher encrypt:%x", msgData)
 		msgData = slf.cipher.Encrypt(msgData)
-		log.Trace("after cipher encrypt:%x", msgData)
+		//log.Trace("after cipher encrypt:%x", msgData)
 	}
 
 	//put data

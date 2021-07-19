@@ -7,7 +7,7 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequebook"
 
-	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
+	msgpkg "github.com/newswarm-lab/new-bee/pkg/bonus/message"
 	"github.com/newswarm-lab/new-bee/pkg/bonus/network"
 
 	"google.golang.org/protobuf/proto"
@@ -26,12 +26,12 @@ func (slf *MyTcpProcessor) OnConnectClose(session *network.Session) {
 }
 
 func (slf *MyTcpProcessor) Heartbeat(session *network.Session) {
-	send := &message.Heartbeat{
+	send := &msgpkg.Heartbeat{
 		Peer:           bonuskey.PeerAddr,
 		EthAddr:        bonuskey.EthAddr,
 		ChequebookAddr: bonuskey.ChequebookAddr,
 	}
-	data, err := network.PutProtobufPayload(uint16(message.CSID_ID_Heartbeat), send)
+	data, err := network.PutProtobufPayload(uint16(msgpkg.CSID_ID_Heartbeat), send)
 	if err != nil {
 		log.Error("PutProtobufPayload error:%s", err.Error())
 	}
@@ -39,7 +39,7 @@ func (slf *MyTcpProcessor) Heartbeat(session *network.Session) {
 }
 
 func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Message) {
-	res := msg.(*message.CipherKeyNtf)
+	res := msg.(*msgpkg.CipherKeyNtf)
 	sCipher := network.NewRc4Cipher([]byte(res.SvrKey))
 	cCipher := network.NewRc4Cipher([]byte(res.CltKey))
 	session.SetCipher(sCipher, cCipher)
@@ -49,17 +49,17 @@ func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Mess
 }
 
 func (slf *MyTcpProcessor) HeartbeatRsp(session *network.Session, msg proto.Message) {
-	res := msg.(*message.HeartbeatRsp)
+	res := msg.(*msgpkg.HeartbeatRsp)
 	log.Info("recv HeartbeatRsp,%+v", res)
 }
 
 func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Message) {
-	res := msg.(*message.EmitCheque)
+	res := msg.(*msgpkg.EmitCheque)
 	signedCheque := &chequebook.SignedCheque{}
 	err := json.Unmarshal(res.Cheque, signedCheque)
 	if err != nil {
 		log.Error("SignedCheque Unmarshal error:%s", err.Error())
 		return
 	}
-	log.Info("recv SignedCheque,%+v", signedCheque)
+	log.Info("recv Cheque Signature:%x", signedCheque.Signature)
 }
