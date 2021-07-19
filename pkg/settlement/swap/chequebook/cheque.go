@@ -54,6 +54,10 @@ var ChequeTypes = eip712.Types{
 			Name: "cumulativePayout",
 			Type: "uint256",
 		},
+		{
+			Name: "id",
+			Type: "uint256",
+		},
 	},
 }
 
@@ -85,6 +89,7 @@ func eip712DataForCheque(cheque *Cheque, chainID int64) *eip712.TypedData {
 			"chequebook":       cheque.Chequebook.Hex(),
 			"beneficiary":      cheque.Beneficiary.Hex(),
 			"cumulativePayout": cheque.CumulativePayout.String(),
+			"id":               cheque.Id.String(),
 		},
 		PrimaryType: "Cheque",
 	}
