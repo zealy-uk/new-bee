@@ -125,9 +125,9 @@ func (r *BonousChequeStore) ChequeToCashout(chequebook chequebookT) (*SignedCheq
 // StoreReceivedBonusCheque stores given signed cheque and caches its key.
 func (r *BonousChequeStore) StoreReceivedBonusCheque(cheque *SignedCheque) (*big.Int, error) {
 	// verify we are the beneficiary
-	if cheque.Beneficiary != r.beneficiary {
-		return nil, ErrWrongBeneficiary
-	}
+	//if cheque.Beneficiary != r.beneficiary {
+	//	return nil, ErrWrongBeneficiary
+	//}
 
 	// don't allow concurrent processing of cheques
 	// this would be sufficient on a per chequebookT basis
