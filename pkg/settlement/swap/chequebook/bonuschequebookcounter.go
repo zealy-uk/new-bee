@@ -27,6 +27,7 @@ type bonusChequebookCounter struct {
 
 func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStorer) *bonusChequebookCounter {
 	once.Do(func() {
+		fmt.Printf("started once.Do()")
 		var chequeKeys []chequeKeyT
 		err := store.Get(bonusChequebookCounterKey(chequebook), &chequeKeys)
 		if err != nil {
