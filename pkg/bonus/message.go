@@ -2,20 +2,22 @@ package bonus
 
 import (
 	"github.com/golang/protobuf/proto"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
+
 )
 
-type message struct {
-	id  CSID
+type message_ struct {
+	id  message.CSID
 	msg proto.Message
 }
 
 type writeMsg struct {
-	msg   *message
+	msg   *message_
 	errCh chan error
 }
 
 type readMsg struct {
-	msg *message
+	msg *message_
 	err error
 }
 

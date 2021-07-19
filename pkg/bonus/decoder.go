@@ -4,14 +4,15 @@ import (
 	"crypto/rc4"
 	"encoding/binary"
 	"github.com/golang/protobuf/proto"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 )
 
 const msgIndexLen = 2
 
 var deEntry = decodeEntry{
-	CSID_ID_CipherKeyNtf: decodeCipherKeyNtf,
-	CSID_ID_HeartbeatRsp: decodeHeartbeatRsp,
-	CSID_ID_EmitCheque:   decodeEmitCheque,
+	message.CSID_ID_CipherKeyNtf: decodeCipherKeyNtf,
+	message.CSID_ID_HeartbeatRsp: decodeHeartbeatRsp,
+	message.CSID_ID_EmitCheque:   decodeEmitCheque,
 }
 
 type decoder struct {
@@ -20,7 +21,7 @@ type decoder struct {
 }
 
 type decodeFn func(int []byte) (proto.Message, error)
-type decodeEntry map[CSID]decodeFn
+type decodeEntry map[message.CSID]decodeFn
 
 func newDecoder(decipher *rc4.Cipher) *decoder {
 	return &decoder{
@@ -29,7 +30,7 @@ func newDecoder(decipher *rc4.Cipher) *decoder {
 	}
 }
 
-func (d *decoder) decode(in []byte, crypt bool) (CSID, proto.Message, error) {
+func (d *decoder) decode(in []byte, crypt bool) (message.CSID, proto.Message, error) {
 	payload := in
 	if crypt {
 		payload = make([]byte, len(in))
@@ -37,15 +38,15 @@ func (d *decoder) decode(in []byte, crypt bool) (CSID, proto.Message, error) {
 	}
 
 	msgID := binary.BigEndian.Uint16(payload[:msgIndexLen])
-	msg, err := deEntry[CSID(msgID)](payload[msgIndexLen:])
+	msg, err := deEntry[message.CSID(msgID)](payload[msgIndexLen:])
 	if err != nil {
-		return CSID(msgID), nil, err
+		return message.CSID(msgID), nil, err
 	}
-	return CSID(msgID), msg, nil
+	return message.CSID(msgID), msg, nil
 }
 
 func decodeCipherKeyNtf(in []byte) (proto.Message, error) {
-	msg := &CipherKeyNtf{}
+	msg := &message.CipherKeyNtf{}
 	if err := proto.Unmarshal(in, msg); err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func decodeCipherKeyNtf(in []byte) (proto.Message, error) {
 }
 
 func decodeHeartbeatRsp(in []byte) (proto.Message, error) {
-	msg := &HeartbeatRsp{}
+	msg := &message.HeartbeatRsp{}
 	if err := proto.Unmarshal(in, msg); err != nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func decodeHeartbeatRsp(in []byte) (proto.Message, error) {
 }
 
 func decodeEmitCheque(in []byte) (proto.Message, error) {
-	msg := &EmitCheque{}
+	msg := &message.EmitCheque{}
 	if err := proto.Unmarshal(in, msg); err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/gogo/protobuf/proto"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequebook"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
@@ -24,7 +25,7 @@ func newChequeHanler(p2pCtx context.Context, peer swarm.Address, swap *swap.Serv
 }
 
 func (c *chequeHandler) handleReceivCheque(msg proto.Message) error  {
-	ec := msg.(*EmitCheque)
+	ec := msg.(*message.EmitCheque)
 
 	signedCheck := &chequebook.SignedCheque{}
 	if err := json.Unmarshal(ec.Cheque, signedCheck); err != nil {

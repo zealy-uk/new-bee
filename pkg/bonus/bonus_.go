@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"sync"
@@ -119,9 +120,9 @@ func (b *Bonus) serveHeartbeater() {
 			}
 		case t := <-ticker.C:
 			fmt.Println("Current time: ", t)
-			msg := &message{
-				id: CSID_ID_Heartbeat,
-				msg: &Heartbeat{
+			msg := &message_{
+				id: message.CSID_ID_Heartbeat,
+				msg: &message.Heartbeat{
 					Peer:    b.peerIDStr,
 					EthAddr: b.ethAdrrStr,
 					ChequebookAddr: b.beneficiaryStr,

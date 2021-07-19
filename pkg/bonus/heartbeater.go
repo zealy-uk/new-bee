@@ -56,7 +56,7 @@ func (h *heartbeater) receive() {
 		default:
 			id, msg, err := h.session.read(h.crypto)
 			h.readCh <- &readMsg{
-				msg: &message{id: id, msg: msg},
+				msg: &message_{id: id, msg: msg},
 				err: err,
 			}
 		}

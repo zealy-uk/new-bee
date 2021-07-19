@@ -2,7 +2,7 @@ api-addr: :11633
 bootnode: []
 bootnode-mode: false
 config: ./bee.yaml
-data-dir: ./bee
+data-dir: ./.bee
 db-open-files-limit: 900
 debug-api-enable: true
 full-node: true

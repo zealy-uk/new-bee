@@ -4,6 +4,7 @@ import (
 	"crypto/rc4"
 	"encoding/binary"
 	"github.com/golang/protobuf/proto"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 	"io"
 	"net"
 )
@@ -26,7 +27,7 @@ func newParser(conn net.Conn) (*parser, error) {
 		return nil, err
 	}
 
-	keys := msg.(*CipherKeyNtf)
+	keys := msg.(*message.CipherKeyNtf)
 	decipher, err := rc4.NewCipher([]byte(keys.SvrKey))
 	if err != nil {
 		return nil, err
@@ -42,7 +43,7 @@ func newParser(conn net.Conn) (*parser, error) {
 	return ps, nil
 }
 
-func (p *parser) read(crypt bool) (CSID, proto.Message, error) {
+func (p *parser) read(crypt bool) (message.CSID, proto.Message, error) {
 	lenb := make([]byte, pkgLen)
 	if _, err := io.ReadFull(p.conn, lenb); err != nil {
 		return 0, nil, err
@@ -58,7 +59,7 @@ func (p *parser) read(crypt bool) (CSID, proto.Message, error) {
 	return p.dec.decode(payload, crypt)
 }
 
-func (p *parser) write(msgID CSID, msg proto.Message, crypt bool) error {
+func (p *parser) write(msgID message.CSID, msg proto.Message, crypt bool) error {
 	payload, err := p.enc.encode(msgID, msg, crypt)
 	if err != nil {
 		return nil

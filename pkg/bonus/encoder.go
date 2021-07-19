@@ -4,10 +4,11 @@ import (
 	"crypto/rc4"
 	"encoding/binary"
 	"github.com/golang/protobuf/proto"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
 )
 
 var enEntry = encodeEntry{
-	CSID_ID_Heartbeat: encodeHeartbeat,
+	message.CSID_ID_Heartbeat: encodeHeartbeat,
 }
 
 type encoder struct {
@@ -23,9 +24,9 @@ func newEncoder(decipher *rc4.Cipher) *encoder {
 }
 
 type encodeFn func(msg proto.Message) ([]byte, error)
-type encodeEntry map[CSID]encodeFn
+type encodeEntry map[message.CSID]encodeFn
 
-func (e *encoder) encode(msgID CSID, msg proto.Message, crypt bool) ([]byte, error) {
+func (e *encoder) encode(msgID message.CSID, msg proto.Message, crypt bool) ([]byte, error) {
 	data, err := enEntry[msgID](msg)
 	if err != nil {
 		return nil, err
