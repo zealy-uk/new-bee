@@ -178,13 +178,18 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error)  {
 	fmt.Printf("Starting perform cashoutService.CashBonusCheque\n")
 	chequebookAddr := chequebookT(chequebook.String())
+	fmt.Printf("cashouService bonusChequeStore is nill:%v\n", s.bonusChequeStore == nil)
 	cheque, err := s.bonusChequeStore.ChequeToCashout(chequebookAddr)
 	if err != nil {
 		return common.Hash{}, err
 	}
 
+	fmt.Printf("Returned cheque to cashout: %v\n", cheque.Signature)
+
+	fmt.Printf("Starting call chequebookABI.Pack")
 	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Signature)
 	if err != nil {
+		fmt.Printf("chequebookABI.Pack Error: %v\n", err)
 		return common.Hash{}, err
 	}
 	lim := sctx.GetGasLimit(ctx)
@@ -201,11 +206,15 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 		Description: "cheque cashout",
 	}
 
+	fmt.Printf("Starting cashoutService.transactionService.Send")
 	txHash, err := s.transactionService.Send(ctx, request)
 	if err != nil {
+		fmt.Printf("s.transactionService.Send. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
+	fmt.Printf("cashoutSerice.bonusChequeStore is nil: %v\n", s.bonusChequeStore == nil)
+	fmt.Printf("Starting cashoutService.bonusChequeStore.StoreCashedBonusCheque")
 	if err = s.bonusChequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
 		return txHash, err
 	}
