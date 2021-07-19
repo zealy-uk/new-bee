@@ -181,6 +181,7 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 	fmt.Printf("cashouService bonusChequeStore is nill:%v\n", s.bonusChequeStore == nil)
 	cheque, err := s.bonusChequeStore.ChequeToCashout(chequebookAddr)
 	if err != nil {
+		fmt.Printf("failed to get cheque to cashout Err: %v\n", err)
 		return common.Hash{}, err
 	}
 

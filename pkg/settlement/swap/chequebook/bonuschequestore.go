@@ -82,19 +82,23 @@ func NewBonusChequeStore(cs *ChequeStoreImp) *BonousChequeStore {
 
 // ChequeToCashout returns the earliest received but not cashed signed cheque
 func (r *BonousChequeStore) ChequeToCashout(chequebook chequebookT) (*SignedCheque, error) {
+	fmt.Printf("Start BonousChequeStore.ChequeToCashout\n")
 	chequebookCounter, err := r.chequebookCounter(chequebook)
 	if err != nil {
+		fmt.Printf("Failed to get a chequebookCounter\n")
 		return nil, err
 	}
 
 	chequeK, err := chequebookCounter.chequeToCashout()
 	if err != nil {
+		fmt.Printf("failed to chequebookCounter.chequeToCashout(). Err: %v\n", err)
 		return nil, err
 	}
 
 	var cheque SignedCheque
 
 	if err := r.store.Get(string(chequeK), &cheque); err != nil {
+		fmt.Printf("r.store.Get failed. Err:%v\n", err)
 		return nil, err
 	}
 
