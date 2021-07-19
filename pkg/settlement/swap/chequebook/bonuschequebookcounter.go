@@ -30,26 +30,27 @@ type bonusChequebookCounter struct {
 
 // todo: init
 func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStorer) (*bonusChequebookCounter, error) {
-	//var b bonusChequebookCounter
-	//err := store.Get(bonusChequebookCounterKey(chequebook), &b)
-	//if err != nil {
-	//	if err == storage.ErrNotFound {
-	//		return &bonusChequebookCounter{
-	//			chequebook: chequebook,
-	//		}, nil
-	//	}
-	//	return nil, err
-	//}
-
-	//return &b, nil
-
 	once.Do(func() {
 		if defaultBonusChequebookCounter == nil {
-			d := &bonusChequebookCounter{
-				chequebook: chequebook,
-				chequeKeys: make([]chequeKeyT, 0, 1024),
+			var b  = bonusChequebookCounter{
+				chequebook: "",
+				chequeKeys: make([]chequeKeyT, 0, 128),
 			}
-			defaultBonusChequebookCounter = d
+			err := store.Get(bonusChequebookCounterKey(chequebook), &b)
+			if err != nil {
+				if err == storage.ErrNotFound {
+					fmt.Printf("coudn't find bonusChequebookCounter for chequebook %q, and a new one will be created.\n", chequebook)
+
+					d := &bonusChequebookCounter{
+						chequebook: chequebook,
+						chequeKeys: make([]chequeKeyT, 0, 1024),
+					}
+
+					defaultBonusChequebookCounter = d
+				}
+
+				fmt.Printf("failed to load bonus chequebook counter from storage. Err: %v\n", err)
+			}
 		}
 	})
 
