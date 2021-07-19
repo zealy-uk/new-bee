@@ -24,5 +24,6 @@ func StartBonus(logger logging.Logger) {
 	pClient := network.NewTCPClient(svrAddr, clientProcessor)
 	pClient.Pingpong = clientProcessor.Heartbeat
 	pClient.PingpongInterval = 15
+	pClient.AutoReconnect = true
 	go pClient.Start()
 }
