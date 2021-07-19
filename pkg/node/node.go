@@ -163,8 +163,6 @@ const (
 	basePrice   = 10000
 )
 
-var BonusSwapService *swap.Service
-
 func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, networkID uint64, logger logging.Logger, libp2pPrivateKey, pssPrivateKey *ecdsa.PrivateKey, o *Options) (b *Bee, err error) {
 	tracer, tracerCloser, err := tracing.NewTracer(&tracing.Options{
 		Enabled:     o.TracingEnabled,
@@ -627,8 +625,6 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 		b.priceOracleCloser = priceOracle
 		acc.SetPayFunc(swapService.Pay)
 	}
-
-	BonusSwapService = swapService
 
 	pricing.SetPaymentThresholdObserver(acc)
 

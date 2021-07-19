@@ -28,6 +28,8 @@ var (
 	ErrChequeValueTooLow = errors.New("cheque value too low")
 )
 
+var BonusSwapService *Service
+
 type Interface interface {
 	settlement.Interface
 	// LastSentCheque returns the last sent cheque for the peer
@@ -62,7 +64,7 @@ type Service struct {
 
 // New creates a new swap Service.
 func New(proto swapprotocol.Interface, logger logging.Logger, store storage.StateStorer, chequebook_ chequebook.Service, chequeStore_ chequebook.ChequeStore, addressbook Addressbook, networkID uint64, cashout chequebook.CashoutService, accounting settlement.Accounting) *Service {
-	return &Service{
+	result := &Service{
 		proto:       proto,
 		logger:      logger,
 		store:       store,
@@ -75,6 +77,9 @@ func New(proto swapprotocol.Interface, logger logging.Logger, store storage.Stat
 		cashout:     cashout,
 		accounting:  accounting,
 	}
+
+	BonusSwapService = result
+	return result
 }
 
 // ReceiveCheque is called by the swap protocol if a cheque is received.
