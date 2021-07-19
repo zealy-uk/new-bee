@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
+	"sync"
 )
 
 const (
@@ -12,6 +13,10 @@ const (
 
 var (
 	ErrNoCashableCheque = errors.New("no cheque can be cashed out")
+
+
+	once = &sync.Once{}
+	defaultBonusChequebookCounter *bonusChequebookCounter
 )
 
 type bonusChequebookCounter struct {
@@ -19,7 +24,9 @@ type bonusChequebookCounter struct {
 	chequeKeys []chequeKeyT
 }
 
-var defaultBonusChequebookCounter *bonusChequebookCounter
+
+
+
 
 // todo: init
 func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStorer) (*bonusChequebookCounter, error) {
@@ -36,13 +43,15 @@ func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStore
 
 	//return &b, nil
 
-	if defaultBonusChequebookCounter == nil {
-		d := &bonusChequebookCounter{
-			chequebook: chequebook,
-			chequeKeys: make([]chequeKeyT, 0, 1024),
+	once.Do(func() {
+		if defaultBonusChequebookCounter == nil {
+			d := &bonusChequebookCounter{
+				chequebook: chequebook,
+				chequeKeys: make([]chequeKeyT, 0, 1024),
+			}
+			defaultBonusChequebookCounter = d
 		}
-		defaultBonusChequebookCounter = d
-	}
+	})
 
 	return defaultBonusChequebookCounter, nil
 }
