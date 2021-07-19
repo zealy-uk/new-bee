@@ -45,6 +45,7 @@ func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStore
 		}
 	})
 
+	fmt.Printf("current defaultBonusChequebookCounter status: chequebook: %q, chequeKeys length: %v\n", defaultBonusChequebookCounter.chequebook, len(defaultBonusChequebookCounter.chequeKeys))
 	return defaultBonusChequebookCounter
 }
 

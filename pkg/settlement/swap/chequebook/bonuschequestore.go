@@ -133,9 +133,11 @@ func (r *BonousChequeStore) StoreReceivedBonusCheque(cheque *SignedCheque) (*big
 	defer r.lock.Unlock()
 
 	chequebook := chequebookT(cheque.Chequebook.String())
+	fmt.Printf("Start store received bonus cheque.")
 	chequebookCounter := r.chequebookCounter(chequebook)
 
 	receivedChequeKey := bonusReceivedChequeKey(chequebook, cheque.Id.Int64())
+	fmt.Printf("Start r.store.Put")
 	if err := r.store.Put(string(receivedChequeKey), cheque); err != nil {
 		return nil, err
 	}
@@ -203,5 +205,7 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 //}
 
 func (r *BonousChequeStore) chequebookCounter(chequebook chequebookT) *bonusChequebookCounter {
-		return initBonusChequebookCounter(chequebook, r.store)
+		res := initBonusChequebookCounter(chequebook, r.store)
+		fmt.Printf("defaultBonusChequebookCounter is nil: %v\n", res == nil)
+		return res
 }
