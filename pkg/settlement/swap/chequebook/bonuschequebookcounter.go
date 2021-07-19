@@ -19,19 +19,25 @@ type bonusChequebookCounter struct {
 	chequeKeys []chequeKeyT
 }
 
+// todo: init
 func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStorer) (*bonusChequebookCounter, error) {
-	var b bonusChequebookCounter
-	err := store.Get(bonusChequebookCounterKey(chequebook), &b)
-	if err != nil {
-		if err == storage.ErrNotFound {
-			return &bonusChequebookCounter{
-				chequebook: chequebook,
-			}, nil
-		}
-		return nil, err
-	}
+	//var b bonusChequebookCounter
+	//err := store.Get(bonusChequebookCounterKey(chequebook), &b)
+	//if err != nil {
+	//	if err == storage.ErrNotFound {
+	//		return &bonusChequebookCounter{
+	//			chequebook: chequebook,
+	//		}, nil
+	//	}
+	//	return nil, err
+	//}
 
-	return &b, nil
+	//return &b, nil
+
+	return &bonusChequebookCounter{
+		chequebook: chequebook,
+		chequeKeys: make([]chequeKeyT, 0, 1024),
+	}, nil
 }
 
 func (b *bonusChequebookCounter) receiveOneCheque(chequeK chequeKeyT) *bonusChequebookCounter {

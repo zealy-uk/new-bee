@@ -214,7 +214,7 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 func (r *BonousChequeStore) chequebookCounter(chequebook chequebookT) (*bonusChequebookCounter, error)  {
 	_, ok := r.chequebookcounters[chequebook]
 	if !ok {
-		counter, err := initBonusChequebookCounter(chequebook, r.store);
+		counter, err := initBonusChequebookCounter(chequebook, r.store)
 		if err != nil {
 			return nil, err
 		}
