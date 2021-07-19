@@ -37,10 +37,11 @@ func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStore
 	//return &b, nil
 
 	if defaultBonusChequebookCounter == nil {
-		return &bonusChequebookCounter{
+		d := &bonusChequebookCounter{
 			chequebook: chequebook,
 			chequeKeys: make([]chequeKeyT, 0, 1024),
-		}, nil
+		}
+		defaultBonusChequebookCounter = d
 	}
 
 	return defaultBonusChequebookCounter, nil

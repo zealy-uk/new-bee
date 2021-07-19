@@ -15,6 +15,7 @@ const (
 type chequebookT string
 type chequeKeyT string
 type cashedChequeKeyT string
+
 //type chequeTxHashT string
 
 func bonusReceivedChequeKey(chequebook chequebookT, chequeId int64) chequeKeyT {
@@ -42,7 +43,7 @@ type BonousChequeStore struct {
 
 	*ChequeStoreImp
 
-	chequebookcounters map[chequebookT]*bonusChequebookCounter
+	chequebookcounter *bonusChequebookCounter
 }
 
 // NewBonusChequeStore creates new BonousChequeStore
@@ -76,8 +77,7 @@ func NewBonusChequeStore(cs *ChequeStoreImp) *BonousChequeStore {
 	//	}
 	//}
 
-	return &BonousChequeStore{cs, make(map[chequebookT]*bonusChequebookCounter, 64)}
-
+	return &BonousChequeStore{cs, nil}
 }
 
 // ChequeToCashout returns the earliest received but not cashed signed cheque
@@ -89,7 +89,7 @@ func (r *BonousChequeStore) ChequeToCashout(chequebook chequebookT) (*SignedCheq
 		return nil, err
 	}
 
-	fmt.Printf("chequebookCounter is nill: %v\n", chequebookCounter==nil)
+	fmt.Printf("chequebookCounter is nill: %v\n", chequebookCounter == nil)
 	fmt.Printf("get a chequebookCounter: %v, but chequeKeys length:%v \n", chequebookCounter, len(chequebookCounter.chequeKeys))
 	chequeK, err := chequebookCounter.chequeToCashout()
 	if err != nil {
@@ -144,7 +144,6 @@ func (r *BonousChequeStore) StoreReceivedBonusCheque(cheque *SignedCheque) (*big
 		return nil, err
 	}
 
-
 	receivedChequeKey := bonusReceivedChequeKey(chequebook, cheque.Id.Int64())
 	if err := r.store.Put(string(receivedChequeKey), cheque); err != nil {
 		return nil, err
@@ -178,7 +177,6 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 	if err := chequebookCounter.confirmChequeToCashout().store(r.store); err != nil {
 		return err
 	}
-
 
 	return nil
 }
@@ -217,15 +215,16 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 //	return results, nil
 //}
 
-func (r *BonousChequeStore) chequebookCounter(chequebook chequebookT) (*bonusChequebookCounter, error)  {
-	_, ok := r.chequebookcounters[chequebook]
-	if !ok {
+func (r *BonousChequeStore) chequebookCounter(chequebook chequebookT) (*bonusChequebookCounter, error) {
+	if r.chequebookcounter == nil {
 		counter, err := initBonusChequebookCounter(chequebook, r.store)
 		if err != nil {
+			fmt.Printf("failed to initBonusChequebookCounter")
 			return nil, err
 		}
-		r.chequebookcounters[chequebook] = counter
+
+		r.chequebookcounter = counter
 	}
 
-	return r.chequebookcounters[chequebook], nil
+	return r.chequebookcounter, nil
 }
