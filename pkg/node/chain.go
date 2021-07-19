@@ -191,6 +191,7 @@ func initChequeStoreCashout(
 		swapBackend,
 		transactionService,
 		chequeStore,
+		chequebook.NewBonusChequeStore(chequeStore.(*chequebook.ChequeStoreImp)),
 	)
 
 	return chequeStore, cashout
