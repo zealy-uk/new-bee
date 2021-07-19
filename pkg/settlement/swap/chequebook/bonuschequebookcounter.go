@@ -25,36 +25,27 @@ type bonusChequebookCounter struct {
 }
 
 
-
-
-
-// todo: init
-func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStorer) (*bonusChequebookCounter, error) {
+func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStorer) *bonusChequebookCounter {
 	once.Do(func() {
-		if defaultBonusChequebookCounter == nil {
-			var b  = bonusChequebookCounter{
-				chequebook: "",
-				chequeKeys: make([]chequeKeyT, 0, 128),
-			}
-			err := store.Get(bonusChequebookCounterKey(chequebook), &b)
-			if err != nil {
-				if err == storage.ErrNotFound {
-					fmt.Printf("coudn't find bonusChequebookCounter for chequebook %q, and a new one will be created.\n", chequebook)
+		var chequeKeys []chequeKeyT
+		err := store.Get(bonusChequebookCounterKey(chequebook), &chequeKeys)
+		if err != nil {
+			if err == storage.ErrNotFound {
+				fmt.Printf("coudn't find chequeKeys for chequebook %q,\n and a new bonusChequebookCounter will be created.\n", chequebook)
 
-					d := &bonusChequebookCounter{
-						chequebook: chequebook,
-						chequeKeys: make([]chequeKeyT, 0, 1024),
-					}
-
-					defaultBonusChequebookCounter = d
+				d := &bonusChequebookCounter{
+					chequebook: chequebook,
+					chequeKeys: make([]chequeKeyT, 0, 1024),
 				}
 
-				fmt.Printf("failed to load bonus chequebook counter from storage. Err: %v\n", err)
+				defaultBonusChequebookCounter = d
 			}
+			fmt.Printf("failed to load bonusChequebookCounter from storage. Err: %w\n", err)
+			panic(fmt.Errorf("failed to load bonusChequebookCounter from storage. Err: %w\n", err))
 		}
 	})
 
-	return defaultBonusChequebookCounter, nil
+	return defaultBonusChequebookCounter
 }
 
 func (b *bonusChequebookCounter) receiveOneCheque(chequeK chequeKeyT) *bonusChequebookCounter {
@@ -83,7 +74,7 @@ func (b *bonusChequebookCounter) confirmChequeToCashout() *bonusChequebookCounte
 }
 
 func (b *bonusChequebookCounter) store(store storage.StateStorer) error {
-	if err := store.Put(bonusChequebookCounterKey(b.chequebook), b); err != nil {
+	if err := store.Put(bonusChequebookCounterKey(b.chequebook), b.chequeKeys); err != nil {
 		fmt.Printf("failed to store bonuschequebookcounter: %v. ERROR: %v\n", b.chequebook, err)
 		return err
 	}
