@@ -45,7 +45,7 @@ func (b *bonusChequebookCounter) receiveOneCheque(chequeK chequeKeyT) *bonusCheq
 
 	b.chequeKeys = append(b.chequeKeys, chequeK)
 	fmt.Printf("bonuschequebookcounter cash. chequebook: %v, chequekey:%v\n", b.chequebook, chequeK)
-	fmt.Printf("bonusChequebookCounter: chequeBook: %v; chequeKeys length:%v", b.chequebook, len(b.chequeKeys))
+	fmt.Printf("bonusChequebookCounter: chequeBook: %v; chequeKeys length:%v\n", b.chequebook, len(b.chequeKeys))
 	return b
 }
 

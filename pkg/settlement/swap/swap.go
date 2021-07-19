@@ -384,6 +384,8 @@ func (s *Service) CashBonusCheque(ctx context.Context, peer swarm.Address) (comm
 	//if !known {
 	//	return common.Hash{}, chequebook.ErrNoCheque
 	//}
+
+	fmt.Printf("Swap Service Cashout is nil:%v\n", s.cashout == nil)
 	return s.cashout.CashBonusCheque(ctx, chequebookAddress, s.chequebook.Address())
 }
 
