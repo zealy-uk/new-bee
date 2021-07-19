@@ -89,6 +89,8 @@ func (r *BonousChequeStore) ChequeToCashout(chequebook chequebookT) (*SignedCheq
 		return nil, err
 	}
 
+	fmt.Printf("chequebookCounter is nill: %v\n", chequebookCounter==nil)
+	fmt.Printf("get a chequebookCounter: %v, but chequeKeys length:%v \n", chequebookCounter, len(chequebookCounter.chequeKeys))
 	chequeK, err := chequebookCounter.chequeToCashout()
 	if err != nil {
 		fmt.Printf("failed to chequebookCounter.chequeToCashout(). Err: %v\n", err)
