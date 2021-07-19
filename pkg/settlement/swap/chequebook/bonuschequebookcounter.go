@@ -29,7 +29,7 @@ func initBonusChequebookCounter(chequebook chequebookT, store storage.StateStore
 	once.Do(func() {
 		fmt.Printf("started once.Do()")
 		var chequeKeys []chequeKeyT
-		err := store.Get(bonusChequebookCounterKey(chequebook), &chequeKeys)
+		err := store.Get(bonusChequebookCounterKey(chequebook), chequeKeys)
 		if err != nil {
 			if err == storage.ErrNotFound {
 				fmt.Printf("coudn't find chequeKeys for chequebook %q,\n and a new bonusChequebookCounter will be created.\n", chequebook)
