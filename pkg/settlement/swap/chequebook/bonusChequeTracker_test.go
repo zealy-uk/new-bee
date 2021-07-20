@@ -57,7 +57,7 @@ func TestBonusChequeTracker(t *testing.T) {
 		t.Error("CashedIndex not increase as expected after calling confirmChequeToCashout")
 	}
 
-	if err := newTracker.store(store); err != nil {
+	if err := newTracker.store(); err != nil {
 		t.Error(err)
 	}
 

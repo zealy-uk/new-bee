@@ -15,31 +15,44 @@ var (
 )
 
 type bonusChequeTracker struct {
+	*tracker
+
+	storer storage.StateStorer
+}
+
+type tracker struct {
 	TotalCheques int
 	CashedIndex  int
 	ChequeKeys   []chequeKeyT
 }
 
-func loadBonusChequeTracker(store storage.StateStorer) *bonusChequeTracker {
-	var tracker bonusChequeTracker
-	err := store.Get(bonusChequeTrackerKey, &tracker)
+func loadBonusChequeTracker(storer storage.StateStorer) *bonusChequeTracker {
+	var tracker_ tracker
+	err := storer.Get(bonusChequeTrackerKey, &tracker_)
 	if err != nil {
 		if err == storage.ErrNotFound {
-			tracker = bonusChequeTracker{
-				ChequeKeys:   make([]chequeKeyT, 0, 1024),
-				TotalCheques: 0,
-				CashedIndex:  -1,
+			btracker_ := bonusChequeTracker{
+				tracker: &tracker{
+					TotalCheques: 0,
+					CashedIndex:  -1,
+					ChequeKeys:   make([]chequeKeyT, 0, 1024),
+				},
+
+				storer: storer,
 			}
 
-			fmt.Printf("new bonusChequeTracker: %+#v\n", tracker)
-			return &tracker
+			fmt.Printf("new bonusChequeTracker: %+#v\n", btracker_)
+			return &btracker_
 
 		}
 		panic(fmt.Errorf("failed to load bonusChequeTracker from storage. Err: %w\n", err))
 	}
 
-	fmt.Printf("loaded bonusChequeTracker. TotalCheques: %v, CashedIndex: %v\n", tracker.TotalCheques, tracker.CashedIndex)
-	return &tracker
+	fmt.Printf("loaded bonusChequeTracker. TotalCheques: %v, CashedIndex: %v\n", tracker_.TotalCheques, tracker_.CashedIndex)
+	return &bonusChequeTracker{
+		tracker: &tracker_,
+		storer: storer,
+	}
 }
 
 func (b *bonusChequeTracker) receiveOneCheque(chequeK chequeKeyT) *bonusChequeTracker {
@@ -64,8 +77,8 @@ func (b *bonusChequeTracker) confirmChequeToCashout() *bonusChequeTracker {
 	return b
 }
 
-func (b *bonusChequeTracker) store(store storage.StateStorer) error {
-	if err := store.Put(bonusChequeTrackerKey, b); err != nil {
+func (b *bonusChequeTracker) store() error {
+	if err := b.storer.Put(bonusChequeTrackerKey, b); err != nil {
 		fmt.Printf("failed to store bonusChequeTracker. ERROR: %v\n", err)
 		return err
 	}

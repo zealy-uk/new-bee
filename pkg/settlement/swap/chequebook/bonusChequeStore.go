@@ -3,20 +3,20 @@ package chequebook
 import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"math/big"
+	"sync"
 )
 
 const (
-	//peerPrefix                = "swap_chequebook_peer_" // copied from pkg/settlement/swap/addressbook.go
-	uncashedBonusChequePrefix = "swap_bonus_chequebook_uncashed_cheque_"
-	cashedBonusChequePrefix   = "swap_bonus_chequebook_cashed_cheque_"
+	uncashedBonusChequePrefix = "bonus_uncashed_cheque_"
+	cashedBonusChequePrefix   = "bonus_cashed_cheque_"
 )
 
 type chequebookT string
 type chequeKeyT string
 type cashedChequeKeyT string
 
-//type chequeTxHashT string
 
 func bonusReceivedChequeKey(chequebook chequebookT, chequeId int64) chequeKeyT {
 	return chequeKeyT(fmt.Sprintf("%schequebook:%s_chequeid:%d", uncashedBonusChequePrefix, chequebook, chequeId))
@@ -25,188 +25,86 @@ func bonusCashedChequeKey(chequebook chequebookT, chequeId int64) cashedChequeKe
 	return cashedChequeKeyT(fmt.Sprintf("%schequebook:%s_chequeid:%d", cashedBonusChequePrefix, chequebook, chequeId))
 }
 
-//func bonusReceivedChequeKeyPrefix(chequebook chequebookT) string {
-//	return fmt.Sprintf("%schequebook:%s", uncashedBonusChequePrefix, chequebook)
-//}
-//
-//func bonusCashedChequeKeyPrefix(chequebook chequebookT) cashedChequeKeyT {
-//	return cashedChequeKeyT(fmt.Sprintf("%schequebook:%s", cashedBonusChequePrefix, chequebook))
-//}
 
 type BonousChequeStore struct {
-	//chequebooksCache  []chequebookT
-	//uncashedKeysCache map[chequebookT][]chequeKeyT
-	//cashedKeysCache   map[chequebookT][]cashedChequeKeyT
-
-	//keyTxCache      map[chequebookT]map[cashedChequeKeyT]chequeTxHashT
-	//txKeyCache      map[chequebookT]map[chequeTxHashT]cashedChequeKeyT
-
-	*ChequeStoreImp
+	tracker *bonusChequeTracker
+	lock *sync.Mutex
+	storer storage.StateStorer
 }
 
 // NewBonusChequeStore creates new BonousChequeStore
-func NewBonusChequeStore(cs *ChequeStoreImp) *BonousChequeStore {
-	//
-	//var chequebookCache = make([]chequebookT, 0, 32)
-	//
-	//if err := cs.store.Iterate(peerPrefix, func(_, value []byte) (stop bool, err error) {
-	//	var chequebook common.Address
-	//
-	//	if err := json.Unmarshal(value, &chequebook); err != nil {
-	//		return true, fmt.Errorf("invalid chequebook value %q: %w", string(value), err)
-	//	}
-	//
-	//	chequebookCache = append(chequebookCache, chequebookT(chequebook.String()))
-	//	return false, nil
-	//}); err != nil {
-	//	panic(fmt.Errorf("iteration failed: build chequebook cache from storage: %w\n", err))
-	//}
-	//
-	//var keysCache = make(map[chequebookT][]chequeKeyT, 32)
-	//
-	//for _, chequebook := range chequebookCache {
-	//	keysCache[chequebook] = make([]chequeKeyT, 0, 128)
-	//	prefix := bonusReceivedChequeKeyPrefix(chequebook)
-	//	if err := cs.store.Iterate(prefix, func(key, _ []byte) (stop bool, err error) {
-	//		keysCache[chequebook] = append(keysCache[chequebook], chequeKeyT(string(key)))
-	//		return false, nil
-	//	}); err != nil {
-	//		panic(fmt.Errorf("iteration failed: build cheque keys cache from storage: %w\n", err))
-	//	}
-	//}
-
-	return &BonousChequeStore{cs}
+func NewBonusChequeStore((*chequebook.ChequeStoreImp)) *BonousChequeStore {
+	return &BonousChequeStore{
+		tracker: loadBonusChequeTracker(BonusStateStorer),
+		lock: BonusLock,
+		storer: BonusStateStorer,
+	}
 }
 
 // ChequeToCashout returns the earliest received but not cashed signed cheque
-func (r *BonousChequeStore) ChequeToCashout(chequebook chequebookT) (*SignedCheque, error) {
-	fmt.Printf("Start BonousChequeStore.ChequeToCashout\n")
-	chequebookCounter := r.chequebookCounter(chequebook)
+func (r *BonousChequeStore) ChequeToCashout() (*SignedCheque, error) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
 
-	fmt.Printf("chequebookCounter is nill: %v\n", chequebookCounter == nil)
-	fmt.Printf("get a chequebookCounter: %v, but chequeKeys length:%v \n", chequebookCounter, len(chequebookCounter.ChequeKeys))
-	chequeK, err := chequebookCounter.chequeToCashout()
+	chequeK, err := r.tracker.chequeToCashout()
 	if err != nil {
-		fmt.Printf("failed to chequebookCounter.chequeToCashout(). Err: %v\n", err)
+		fmt.Printf("xxxxxxxxxx chequeToCashout() failed. Err: %v\n", err)
 		return nil, err
 	}
 
 	var cheque SignedCheque
 
-	if err := r.store.Get(string(chequeK), &cheque); err != nil {
-		fmt.Printf("r.store.Get failed. Err:%v\n", err)
+	if err := r.storer.Get(string(chequeK), &cheque); err != nil {
+		fmt.Printf("xxxxxxxxxx BonusStateStorer.Get() failed. Err:%v\n", err)
 		return nil, err
 	}
 
 	return &cheque, nil
 }
 
-//// DeleteEearliestBonusCheque deletes the earliest received signed cheque from both storage and cache.
-//// This function should called only after the signed cheque has been cashed out successfully.
-//func (r *BonousChequeStore) DeleteEearliestBonusCheque(chequebook chequebookT) error {
-//	keysqueue, ok := r.uncashedKeysCache[chequebook]
-//	if ok {
-//		if len(keysqueue) > 0 {
-//			chequekey := keysqueue[0]
-//
-//			if err := r.store.Delete(string(chequekey)); err != nil {
-//				return nil
-//			}
-//
-//			keysqueue = keysqueue[1:]
-//		}
-//	}
-//
-//	return nil
-//}
-
 // StoreReceivedBonusCheque stores given signed cheque and caches its key.
 func (r *BonousChequeStore) StoreReceivedBonusCheque(cheque *SignedCheque) (*big.Int, error) {
-	// verify we are the beneficiary
-	//if cheque.Beneficiary != r.beneficiary {
-	//	return nil, ErrWrongBeneficiary
-	//}
-
-	// don't allow concurrent processing of cheques
-	// this would be sufficient on a per chequebookT basis
 	r.lock.Lock()
 	defer r.lock.Unlock()
 
 	chequebook := chequebookT(cheque.Chequebook.String())
-	fmt.Printf("Start store received bonus cheque.")
-	chequebookCounter := r.chequebookCounter(chequebook)
+	chequeKey := bonusReceivedChequeKey(chequebook, cheque.Id.Int64())
 
-	receivedChequeKey := bonusReceivedChequeKey(chequebook, cheque.Id.Int64())
-	fmt.Printf("Start r.store.Put")
-	if err := r.store.Put(string(receivedChequeKey), cheque); err != nil {
+	if err := r.storer.Put(string(chequeKey), cheque); err != nil {
+		fmt.Printf("xxxxxxxxxx failed to store cheque:%q\n", chequeKey)
 		return nil, err
 	}
 
-	if err := chequebookCounter.receiveOneCheque(receivedChequeKey).store(r.store); err != nil {
+	if err := r.tracker.receiveOneCheque(chequeKey).store(); err != nil {
+		fmt.Printf("xxxxxxxxxx failed to store bonusChequeTracker.\n")
 		return nil, err
 	}
 
-	fmt.Printf("%v received and stored.\n", receivedChequeKey)
+	fmt.Printf("StoreReceivedBonusCheque(%q) completed.\n", chequeKey)
 	return cheque.CumulativePayout, nil
 }
 
 // StoreCashedBonusCheque stores given already cashed signed cheque and caches key-txhash/txhas-key map.
 func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash common.Hash) error {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+
 	chequebook := chequebookT(cheque.Chequebook.String())
 	chequeId := cheque.Id.Int64()
 	cashedChequeKey_ := bonusCashedChequeKey(chequebook, chequeId)
-	if err := r.store.Put(string(cashedChequeKey_), &cashoutAction{
+	if err := r.storer.Put(string(cashedChequeKey_), &cashoutAction{
 		TxHash: txhash,
 		Cheque: *cheque,
 	}); err != nil {
+		fmt.Printf("xxxxxxxxxx failed to store cashed bonus cheque %q.\n", cashedChequeKey_)
 		return err
 	}
 
-	chequebookCounter := r.chequebookCounter(chequebook)
-	if err := chequebookCounter.confirmChequeToCashout().store(r.store); err != nil {
+	if err := r.tracker.confirmChequeToCashout().store(); err != nil {
+		fmt.Printf("xxxxxxxxxx failed to store bonusChequeTracker.\n")
 		return err
 	}
 
+	fmt.Printf("StoreCashedBonusCheque(%q) completed.\n", cashedChequeKey_)
 	return nil
-}
-
-//// ReceivedBonusCheques returns all received bonus cheques to a chequebookT that not yet cashed.
-//func (r *BonousChequeStore) ReceivedBonusCheques(chequebook chequebookT) ([]*SignedCheque, error) {
-//	keysQueue, ok := r.uncashedKeysCache[chequebook]
-//	if !ok {
-//		return nil, nil
-//	}
-//
-//	var results []*SignedCheque
-//	for _, key := range keysQueue {
-//		var cheque SignedCheque
-//		if err := r.store.Get(string(key), &cheque); err != nil {
-//			return results, err
-//		}
-//
-//		results = append(results, cheque)
-//	}
-//
-//	return results, nil
-//}
-//
-//// AllReceivedBonusCheques returns all received bonus cheques that not yet cashed.
-//func (r *BonousChequeStore) AllReceivedBonusCheques() (map[chequebookT][]*SignedCheque, error) {
-//	var results = make(map[chequebookT][]*SignedCheque, 256)
-//	for _, chequebook := range r.chequebooksCache {
-//		cheques, err := r.ReceivedBonusCheques(chequebook)
-//
-//		results[chequebook] = cheques
-//		if err != nil {
-//			return results, nil
-//		}
-//	}
-//	return results, nil
-//}
-
-func (r *BonousChequeStore) chequebookCounter(chequebook chequebookT) *bonusChequeTracker {
-	fmt.Printf("called initbonusChequeTracker")
-		res := loadBonusChequeTracker(r.store)
-		fmt.Printf("defaultbonusChequeTracker is nil: %v\n", res == nil)
-		return res
 }

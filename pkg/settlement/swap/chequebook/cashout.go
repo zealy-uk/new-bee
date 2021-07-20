@@ -176,26 +176,19 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 
 // CashBonusCheque sends a cashout transaction for the earliest uncashed cheque of the chequebook
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error) {
-	fmt.Printf("********* CashBonusCheque chequebook:%s,recipient%s\n", chequebook.String(), recipient.String())
-	chequebookAddr := chequebookT(chequebook.String())
-	fmt.Printf("cashouService bonusChequeStore is nill:%v\n", s.bonusChequeStore == nil)
-	cheque, err := s.bonusChequeStore.ChequeToCashout(chequebookAddr)
+	cheque, err := s.bonusChequeStore.ChequeToCashout()
 	if err != nil {
-		fmt.Printf("failed to get cheque to cashout Err: %v\n", err)
+		fmt.Printf("bonusChequeStore.ChequeToCashout() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
-	fmt.Printf("*************Returned cheque to cashout: %+v,sig:%x,recipient:%x\n", cheque, cheque.Signature, recipient)
-
-	fmt.Printf("Starting call chequebookABI.Pack\n")
 	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
 	if err != nil {
-		fmt.Printf("chequebookABI.Pack Error: %v\n", err)
+		fmt.Printf("chequebookABI.Pack() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 	lim := sctx.GetGasLimit(ctx)
 	if lim == 0 {
-		// fix for out of gas errors
 		lim = 300000
 	}
 	request := &transaction.TxRequest{
@@ -207,21 +200,18 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 		Description: "cheque cashout",
 	}
 
-	fmt.Printf("****************.Send  request:%+v", request)
 	txHash, err := s.transactionService.Send(ctx, request)
 	if err != nil {
-		fmt.Printf("s.transactionService.Send. Error: %v\n", err)
+		fmt.Printf("transactionService.Send() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
-	fmt.Printf("cashoutSerice.bonusChequeStore is nil: %v\n", s.bonusChequeStore == nil)
-	fmt.Printf("Starting cashoutService.bonusChequeStore.StoreCashedBonusCheque")
 	if err = s.bonusChequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
+		fmt.Printf("bonusChequeStore.StoreCashedBonusCheque() failed. Error: %v\n", err)
 		return txHash, err
 	}
 
-	fmt.Printf("cheque: %v is cashed and txHash:%v is stored successfully\n", cheque.Signature, txHash)
-
+	fmt.Printf("CashBonusCheque() completed. txHash: %q\n", txHash.Hex())
 	return txHash, nil
 }
 

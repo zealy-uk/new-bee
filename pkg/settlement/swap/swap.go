@@ -74,7 +74,7 @@ func New(proto swapprotocol.Interface, logger logging.Logger, store storage.Stat
 		metrics:     newMetrics(),
 		chequebook:  chequebook_,
 		chequeStore: chequeStore_,
-		bonusChequeStore: chequebook.NewBonusChequeStore(chequeStore_.(*chequebook.ChequeStoreImp)),
+		bonusChequeStore: chequebook.NewBonusChequeStore(),
 		addressbook: addressbook,
 		networkID:   networkID,
 		cashout:     cashout,
@@ -129,7 +129,6 @@ func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque 
 // ReceiveBonusCheque is called by the swap protocol if a bonus cheque is received.
 func (s *Service) ReceiveBonusCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) (err error) {
 	// check this is the same chequebook for this peer as previously
-	fmt.Printf("starting swap::Service.ReceiveBonusCheque process.")
 	_, known, err := s.addressbook.Chequebook(peer)
 
 	BonusPeerAdress = peer

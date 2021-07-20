@@ -37,10 +37,11 @@ var (
 	ErrBouncingCheque = errors.New("bouncing cheque")
 	// ErrChequeValueTooLow is the error returned if the after deduction value of a cheque did not cover 1 accounting credit
 	ErrChequeValueTooLow = errors.New("cheque value lower than acceptable")
+
+	BonusLock *sync.Mutex
+	BonusStateStorer storage.StateStorer
 )
 
-//
-//var bonusReceivedCheque = make([]*SignedCheque, 0, 1024)
 
 // ChequeStore handles the verification and storage of received cheques
 type ChequeStore interface {
@@ -72,7 +73,7 @@ func NewChequeStore(
 	beneficiary common.Address,
 	transactionService transaction.Service,
 	recoverChequeFunc RecoverChequeFunc) ChequeStore {
-	return &ChequeStoreImp{
+	cs := &ChequeStoreImp{
 		store:              store,
 		factory:            factory,
 		chaindID:           chainID,
@@ -80,6 +81,11 @@ func NewChequeStore(
 		beneficiary:        beneficiary,
 		recoverChequeFunc:  recoverChequeFunc,
 	}
+
+	BonusLock = &cs.lock
+	BonusStateStorer = cs.store
+
+	return cs
 }
 
 // lastReceivedChequeKey computes the key where to store the last cheque received from a chequebook.
