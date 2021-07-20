@@ -3,7 +3,6 @@ package bonus
 import (
 	"github.com/golang/protobuf/proto"
 	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
-
 )
 
 type message_ struct {

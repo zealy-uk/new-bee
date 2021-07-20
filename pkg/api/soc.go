@@ -11,12 +11,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/cac"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/postage"
 	"github.com/newswarm-lab/new-bee/pkg/soc"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/gorilla/mux"
 )
 
 var errBadRequestParams = errors.New("owner, id or span is not well formed")

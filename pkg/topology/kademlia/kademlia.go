@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/addressbook"
 	"github.com/newswarm-lab/new-bee/pkg/discovery"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
@@ -25,7 +26,6 @@ import (
 	im "github.com/newswarm-lab/new-bee/pkg/topology/kademlia/internal/metrics"
 	"github.com/newswarm-lab/new-bee/pkg/topology/kademlia/internal/waitnext"
 	"github.com/newswarm-lab/new-bee/pkg/topology/pslice"
-	ma "github.com/multiformats/go-multiaddr"
 )
 
 const (

@@ -9,8 +9,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/newswarm-lab/new-bee/pkg/p2p"
 	"github.com/libp2p/go-libp2p-core/network"
+	"github.com/newswarm-lab/new-bee/pkg/p2p"
 )
 
 var (

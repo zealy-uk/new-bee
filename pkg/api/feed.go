@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/feeds"
 	"github.com/newswarm-lab/new-bee/pkg/file/loadsave"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
@@ -22,7 +23,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/postage"
 	"github.com/newswarm-lab/new-bee/pkg/soc"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/gorilla/mux"
 )
 
 const (

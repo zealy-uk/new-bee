@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/newswarm-lab/new-bee/pkg/shed"
 	ma "github.com/multiformats/go-multiaddr"
+	"github.com/newswarm-lab/new-bee/pkg/shed"
 
 	"github.com/newswarm-lab/new-bee/pkg/addressbook"
 	"github.com/newswarm-lab/new-bee/pkg/bzz"

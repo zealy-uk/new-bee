@@ -9,9 +9,9 @@ import (
 	"errors"
 	"io"
 
-	"github.com/newswarm-lab/new-bee/pkg/p2p"
 	ggio "github.com/gogo/protobuf/io"
 	"github.com/gogo/protobuf/proto"
+	"github.com/newswarm-lab/new-bee/pkg/p2p"
 )
 
 const delimitedReaderMaxSize = 128 * 1024 // max message size

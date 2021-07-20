@@ -11,13 +11,13 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/debugapi"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp/jsonhttptest"
 	"github.com/newswarm-lab/new-bee/pkg/p2p/mock"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/multiformats/go-multiaddr"
 )
 
 func TestAddresses(t *testing.T) {

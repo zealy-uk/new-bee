@@ -14,13 +14,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/postage"
 	"github.com/newswarm-lab/new-bee/pkg/pss"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 )
 
 var (

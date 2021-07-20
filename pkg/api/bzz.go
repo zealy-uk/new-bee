@@ -19,6 +19,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gorilla/mux"
 
+	"github.com/ethersphere/langos"
 	"github.com/newswarm-lab/new-bee/pkg/feeds"
 	"github.com/newswarm-lab/new-bee/pkg/file/joiner"
 	"github.com/newswarm-lab/new-bee/pkg/file/loadsave"
@@ -30,7 +31,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/newswarm-lab/new-bee/pkg/tags"
 	"github.com/newswarm-lab/new-bee/pkg/tracing"
-	"github.com/ethersphere/langos"
 )
 
 func (s *server) bzzUploadHandler(w http.ResponseWriter, r *http.Request) {

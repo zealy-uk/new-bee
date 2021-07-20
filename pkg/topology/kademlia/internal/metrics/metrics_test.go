@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/newswarm-lab/new-bee/pkg/shed"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/newswarm-lab/new-bee/pkg/topology/kademlia/internal/metrics"
-	"github.com/google/go-cmp/cmp"
 )
 
 func snapshot(t *testing.T, mc *metrics.Collector, sst time.Time, addr swarm.Address) *metrics.Snapshot {

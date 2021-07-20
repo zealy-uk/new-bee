@@ -109,9 +109,9 @@ type Bee struct {
 	postageServiceCloser     io.Closer
 	priceOracleCloser        io.Closer
 	//bonusCloser              io.Closer
-	bonusClientCloser        io.Closer
-	shutdownInProgress       bool
-	shutdownMutex            sync.Mutex
+	bonusClientCloser  io.Closer
+	shutdownInProgress bool
+	shutdownMutex      sync.Mutex
 }
 
 type Options struct {

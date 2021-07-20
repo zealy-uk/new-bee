@@ -9,10 +9,10 @@ import (
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/multiformats/go-multiaddr"
 )
 
 type addressesResponse struct {

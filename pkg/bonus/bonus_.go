@@ -12,12 +12,12 @@ import (
 )
 
 type Bonus struct {
-	peerIDStr  string
-	ethAdrrStr string
+	peerIDStr      string
+	ethAdrrStr     string
 	beneficiaryStr string
 
-	peer swarm.Address
-	ethAdrr common.Address
+	peer        swarm.Address
+	ethAdrr     common.Address
 	beneficiary common.Address
 
 	closeCh closeCh
@@ -35,7 +35,7 @@ type Bonus struct {
 	pingTimeout   time.Duration
 
 	p2pCtx context.Context
-	swap *swap.Service
+	swap   *swap.Service
 
 	chequeHandler *chequeHandler
 }
@@ -59,14 +59,13 @@ func New(p2pCtx context.Context, swap *swap.Service, peer swarm.Address, ethAdrr
 	hb := newHeartbeater(activeSession, hbWriteCh, hbReadCh)
 	ch := newChequeHanler(p2pCtx, peer, swap)
 
-
 	b := &Bonus{
-		peerIDStr:  peer.String(),
-		ethAdrrStr: ethAdrr.String(),
+		peerIDStr:      peer.String(),
+		ethAdrrStr:     ethAdrr.String(),
 		beneficiaryStr: beneficiary.String(),
 
-		peer: peer,
-		ethAdrr: ethAdrr,
+		peer:        peer,
+		ethAdrr:     ethAdrr,
 		beneficiary: beneficiary,
 
 		closeCh: make(chan struct{}),
@@ -83,7 +82,7 @@ func New(p2pCtx context.Context, swap *swap.Service, peer swarm.Address, ethAdrr
 		pingTimeout:   pingTimeout,
 
 		p2pCtx: p2pCtx,
-		swap: swap,
+		swap:   swap,
 
 		chequeHandler: ch,
 	}
@@ -123,8 +122,8 @@ func (b *Bonus) serveHeartbeater() {
 			msg := &message_{
 				id: message.CSID_ID_Heartbeat,
 				msg: &message.Heartbeat{
-					Peer:    b.peerIDStr,
-					EthAddr: b.ethAdrrStr,
+					Peer:           b.peerIDStr,
+					EthAddr:        b.ethAdrrStr,
 					ChequebookAddr: b.beneficiaryStr,
 				},
 			}
@@ -164,4 +163,3 @@ func (b *Bonus) serveHeartbeater() {
 		}
 	}
 }
-

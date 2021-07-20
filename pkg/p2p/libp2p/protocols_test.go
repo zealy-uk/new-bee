@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/multiformats/go-multistream"
 	"github.com/newswarm-lab/new-bee/pkg/p2p"
 	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p"
-	"github.com/multiformats/go-multistream"
 )
 
 func TestNewStream(t *testing.T) {

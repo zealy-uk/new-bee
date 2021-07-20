@@ -12,11 +12,11 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/bigint"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
-	"github.com/gorilla/mux"
 )
 
 const (

@@ -8,11 +8,11 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/pinning"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/gorilla/mux"
 )
 
 // pinRootHash pins root hash of given reference. This method is idempotent.

@@ -11,9 +11,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/newswarm-lab/new-bee/pkg/shed"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/hashicorp/go-multierror"
 	"github.com/syndtr/goleveldb/leveldb"
 	"go.uber.org/atomic"
 )

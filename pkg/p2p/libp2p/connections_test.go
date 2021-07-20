@@ -12,6 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/libp2p/go-libp2p-core/mux"
+	libp2ppeer "github.com/libp2p/go-libp2p-core/peer"
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/addressbook"
 	"github.com/newswarm-lab/new-bee/pkg/p2p"
 	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p"
@@ -20,9 +23,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/newswarm-lab/new-bee/pkg/swarm/test"
 	"github.com/newswarm-lab/new-bee/pkg/topology/lightnode"
-	"github.com/libp2p/go-libp2p-core/mux"
-	libp2ppeer "github.com/libp2p/go-libp2p-core/peer"
-	ma "github.com/multiformats/go-multiaddr"
 )
 
 func TestAddresses(t *testing.T) {

@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/btcsuite/btcd/btcec"
+	"github.com/gorilla/websocket"
 	"github.com/newswarm-lab/new-bee/pkg/api"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
@@ -30,7 +31,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/pushsync"
 	"github.com/newswarm-lab/new-bee/pkg/storage/mock"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/gorilla/websocket"
 )
 
 var (
