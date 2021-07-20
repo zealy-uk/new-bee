@@ -1,4 +1,4 @@
-package chequebook_test
+package chequebook
 
 import (
 	"github.com/newswarm-lab/new-bee/pkg/logging"
@@ -17,4 +17,7 @@ func TestBonusChequeTracker(t *testing.T) {
 	}
 
 	_ = store
+
+	tracker := initbonusChequeTracker(bonusChequeTrackerKey, store)
+	t.Log(tracker)
 }
