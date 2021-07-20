@@ -1,4 +1,4 @@
-package chequebook
+package chequebook_test
 
 import (
 	"github.com/newswarm-lab/new-bee/pkg/logging"
