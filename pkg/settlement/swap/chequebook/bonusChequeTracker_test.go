@@ -21,7 +21,7 @@ func TestBonusChequeTracker(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	newTracker := initbonusChequeTracker(store)
+	newTracker := loadBonusChequeTracker(store)
 
 	var chequeKeys = []chequeKeyT{
 		"chequeKey0",
@@ -61,11 +61,11 @@ func TestBonusChequeTracker(t *testing.T) {
 		t.Error(err)
 	}
 
-	loadedTracker := initbonusChequeTracker(store)
+	loadedTracker := loadBonusChequeTracker(store)
 	if len(loadedTracker.ChequeKeys) != loadedTracker.TotalCheques {
 		t.Errorf("Loaded bonusChequeTracker unexpectedly.")
 	}
-	if loadedTracker.CashedIndex == 0 {
+	if loadedTracker.CashedIndex != 0 {
 		t.Errorf("Loaded bonusChequeTracker unexpectedly.")
 	}
 	if loadedTracker.TotalCheques != 6 {

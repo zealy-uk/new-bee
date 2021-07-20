@@ -12,8 +12,6 @@ const (
 
 var (
 	ErrNoCashableCheque = errors.New("no cheque can be cashed out")
-
-	//myBonusChequeTracker *bonusChequeTracker
 )
 
 type bonusChequeTracker struct {
@@ -22,32 +20,32 @@ type bonusChequeTracker struct {
 	ChequeKeys   []chequeKeyT
 }
 
-func initbonusChequeTracker(store storage.StateStorer) *bonusChequeTracker {
-		var tracker bonusChequeTracker
-		err := store.Get(bonusChequeTrackerKey, &tracker)
-		if err != nil {
-			if err == storage.ErrNotFound {
-				tracker = bonusChequeTracker{
-					ChequeKeys:   make([]chequeKeyT, 0, 1024),
-					TotalCheques: 0,
-					CashedIndex:  -1,
-				}
-
-				fmt.Printf("new bonusChequeTracker: %+#v\n", tracker)
-				return &tracker
-
+func loadBonusChequeTracker(store storage.StateStorer) *bonusChequeTracker {
+	var tracker bonusChequeTracker
+	err := store.Get(bonusChequeTrackerKey, &tracker)
+	if err != nil {
+		if err == storage.ErrNotFound {
+			tracker = bonusChequeTracker{
+				ChequeKeys:   make([]chequeKeyT, 0, 1024),
+				TotalCheques: 0,
+				CashedIndex:  -1,
 			}
-			panic(fmt.Errorf("failed to load bonusChequeTracker from storage. Err: %w\n", err))
-		}
 
-	//fmt.Printf("loaded bonusChequeTracker: %+v\n", tracker)
+			fmt.Printf("new bonusChequeTracker: %+#v\n", tracker)
+			return &tracker
+
+		}
+		panic(fmt.Errorf("failed to load bonusChequeTracker from storage. Err: %w\n", err))
+	}
+
+	fmt.Printf("loaded bonusChequeTracker. TotalCheques: %v, CashedIndex: %v\n", tracker.TotalCheques, tracker.CashedIndex)
 	return &tracker
 }
 
 func (b *bonusChequeTracker) receiveOneCheque(chequeK chequeKeyT) *bonusChequeTracker {
 	b.ChequeKeys = append(b.ChequeKeys, chequeK)
 	b.TotalCheques++
-	fmt.Printf("cheque %q cached. total cheques=%d, cashed index=%d\n", chequeK, b.TotalCheques, b.CashedIndex)
+	fmt.Printf("cheque %q cached. totalCheques=%d, cashedIndex=%d\n", chequeK, b.TotalCheques, b.CashedIndex)
 	return b
 }
 
@@ -68,9 +66,9 @@ func (b *bonusChequeTracker) confirmChequeToCashout() *bonusChequeTracker {
 
 func (b *bonusChequeTracker) store(store storage.StateStorer) error {
 	if err := store.Put(bonusChequeTrackerKey, b); err != nil {
-		fmt.Printf("failed to store: %+v. ERROR: %v\n", b, err)
+		fmt.Printf("failed to store bonusChequeTracker. ERROR: %v\n", err)
 		return err
 	}
-	//fmt.Printf("stored %+v\n", b)
+	fmt.Printf("stored bonusChequeTracker\n")
 	return nil
 }
