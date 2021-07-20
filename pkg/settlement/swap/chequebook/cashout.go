@@ -38,7 +38,6 @@ type cashoutService struct {
 	backend            transaction.Backend
 	transactionService transaction.Service
 	chequeStore        ChequeStore
-	bonusChequeStore   *BonousChequeStore
 }
 
 // LastCashout contains information about the last cashout
@@ -86,14 +85,12 @@ func NewCashoutService(
 	backend transaction.Backend,
 	transactionService transaction.Service,
 	chequeStore_ ChequeStore,
-	bonusChequeStore_ *BonousChequeStore,
 ) CashoutService {
 	return &cashoutService{
 		store:              store,
 		backend:            backend,
 		transactionService: transactionService,
 		chequeStore:        chequeStore_,
-		bonusChequeStore:   bonusChequeStore_,
 	}
 }
 
@@ -176,15 +173,15 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 
 // CashBonusCheque sends a cashout transaction for the earliest uncashed cheque of the chequebook
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error) {
-	cheque, err := s.bonusChequeStore.ChequeToCashout()
+	cheque, err := s.chequeStore.ChequeToCashout()
 	if err != nil {
-		fmt.Printf("bonusChequeStore.ChequeToCashout() failed. Error: %v\n", err)
+		fmt.Printf("xxxxxxxxxx bonusChequeStore.ChequeToCashout() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
 	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
 	if err != nil {
-		fmt.Printf("chequebookABI.Pack() failed. Error: %v\n", err)
+		fmt.Printf("xxxxxxxxxx chequebookABI.Pack() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 	lim := sctx.GetGasLimit(ctx)
@@ -202,16 +199,15 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 
 	txHash, err := s.transactionService.Send(ctx, request)
 	if err != nil {
-		fmt.Printf("transactionService.Send() failed. Error: %v\n", err)
+		fmt.Printf("xxxxxxxxxx transactionService.Send() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
-	if err = s.bonusChequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
-		fmt.Printf("bonusChequeStore.StoreCashedBonusCheque() failed. Error: %v\n", err)
+	if err = s.chequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
+		fmt.Printf("xxxxxxxxxx bonusChequeStore.StoreCashedBonusCheque() failed. Error: %v\n", err)
 		return txHash, err
 	}
 
-	fmt.Printf("CashBonusCheque() completed. txHash: %q\n", txHash.Hex())
 	return txHash, nil
 }
 

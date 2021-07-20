@@ -6,7 +6,6 @@ package debugapi
 
 import (
 	"errors"
-	"fmt"
 	"math/big"
 	"net/http"
 	"strconv"
@@ -248,15 +247,6 @@ func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Service) swapBonusCashoutHandler(w http.ResponseWriter, r *http.Request) {
-	//addr := mux.Vars(r)["peer"]
-	//peer, err := swarm.ParseHexAddress(addr)
-	//if err != nil {
-	//	s.logger.Debugf("debug api: cashout peer: invalid peer address %s: %v", addr, err)
-	//	s.logger.Errorf("debug api: cashout peer: invalid peer address %s", addr)
-	//	jsonhttp.NotFound(w, errInvalidAddress)
-	//	return
-	//}
-	fmt.Printf("debug api: Received Bonus Cashout Request.\n")
 	ctx := r.Context()
 	if price, ok := r.Header[gasPriceHeader]; ok {
 		p, ok := big.NewInt(0).SetString(price[0], 10)
@@ -288,11 +278,9 @@ func (s *Service) swapBonusCashoutHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	jsonhttp.OK(w, swapCashoutResponse{TransactionHash: txHash.String()})
-	fmt.Printf("debug api: Bonus Cashout Responsed OK!\n")
+	jsonhttp.OK(w, swapCashoutResponse{TransactionHash: txHash.Hex()})
+	s.logger.Tracef("debug api: bonus cashout success: txHash=%q\n", txHash.Hex())
 }
-
-
 
 type swapCashoutStatusResult struct {
 	Recipient  common.Address `json:"recipient"`

@@ -12,19 +12,19 @@ import (
 
 type chequeHandler struct {
 	p2pCtx context.Context
-	peer swarm.Address
-	swap *swap.Service
+	peer   swarm.Address
+	swap   *swap.Service
 }
 
 func newChequeHanler(p2pCtx context.Context, peer swarm.Address, swap *swap.Service) *chequeHandler {
 	return &chequeHandler{
 		p2pCtx: p2pCtx,
-		peer: peer,
-		swap: swap,
+		peer:   peer,
+		swap:   swap,
 	}
 }
 
-func (c *chequeHandler) handleReceivCheque(msg proto.Message) error  {
+func (c *chequeHandler) handleReceivCheque(msg proto.Message) error {
 	ec := msg.(*message.EmitCheque)
 
 	signedCheck := &chequebook.SignedCheque{}

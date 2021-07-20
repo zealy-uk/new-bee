@@ -17,7 +17,6 @@ type chequebookT string
 type chequeKeyT string
 type cashedChequeKeyT string
 
-
 func bonusReceivedChequeKey(chequebook chequebookT, chequeId int64) chequeKeyT {
 	return chequeKeyT(fmt.Sprintf("%schequebook:%s_chequeid:%d", uncashedBonusChequePrefix, chequebook, chequeId))
 }
@@ -25,19 +24,18 @@ func bonusCashedChequeKey(chequebook chequebookT, chequeId int64) cashedChequeKe
 	return cashedChequeKeyT(fmt.Sprintf("%schequebook:%s_chequeid:%d", cashedBonusChequePrefix, chequebook, chequeId))
 }
 
-
 type BonousChequeStore struct {
 	tracker *bonusChequeTracker
-	lock *sync.Mutex
-	storer storage.StateStorer
+	lock    *sync.Mutex
+	storer  storage.StateStorer
 }
 
 // NewBonusChequeStore creates new BonousChequeStore
-func NewBonusChequeStore((*chequebook.ChequeStoreImp)) *BonousChequeStore {
+func newBonusChequeStore(lock *sync.Mutex, storer storage.StateStorer) *BonousChequeStore {
 	return &BonousChequeStore{
-		tracker: loadBonusChequeTracker(BonusStateStorer),
-		lock: BonusLock,
-		storer: BonusStateStorer,
+		tracker: loadBonusChequeTracker(storer),
+		lock:    lock,
+		storer:  storer,
 	}
 }
 

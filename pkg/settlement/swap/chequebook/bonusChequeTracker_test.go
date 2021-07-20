@@ -72,7 +72,6 @@ func TestBonusChequeTracker(t *testing.T) {
 		t.Errorf("Loaded bonusChequeTracker unexpectedly.")
 	}
 
-
 	if err := os.RemoveAll(storepath); err != nil {
 		t.Fatal(err)
 	}

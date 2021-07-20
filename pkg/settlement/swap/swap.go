@@ -28,10 +28,8 @@ var (
 	ErrChequeValueTooLow = errors.New("cheque value too low")
 
 	BonusSwapService *Service
-	BonusPeerAdress swarm.Address
+	BonusPeerAdress  swarm.Address
 )
-
-
 
 type Interface interface {
 	settlement.Interface
@@ -59,7 +57,7 @@ type Service struct {
 	metrics     metrics
 	chequebook  chequebook.Service
 	chequeStore chequebook.ChequeStore
-	bonusChequeStore *chequebook.BonousChequeStore
+	//bonusChequeStore *chequebook.BonousChequeStore
 	cashout     chequebook.CashoutService
 	addressbook Addressbook
 	networkID   uint64
@@ -74,7 +72,7 @@ func New(proto swapprotocol.Interface, logger logging.Logger, store storage.Stat
 		metrics:     newMetrics(),
 		chequebook:  chequebook_,
 		chequeStore: chequeStore_,
-		bonusChequeStore: chequebook.NewBonusChequeStore(),
+		//bonusChequeStore: chequebook.NewBonusChequeStore(),
 		addressbook: addressbook,
 		networkID:   networkID,
 		cashout:     cashout,
@@ -133,7 +131,7 @@ func (s *Service) ReceiveBonusCheque(ctx context.Context, peer swarm.Address, ch
 
 	BonusPeerAdress = peer
 
-	receivedAmount, err := s.bonusChequeStore.StoreReceivedBonusCheque(cheque)
+	receivedAmount, err := s.chequeStore.StoreReceivedBonusCheque(cheque)
 	if err != nil {
 		s.metrics.ChequesRejected.Inc()
 		return fmt.Errorf("rejecting cheque: %w", err)
@@ -376,20 +374,10 @@ func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Ha
 }
 
 func (s *Service) CashBonusCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
-	fmt.Printf("Receive CashBonusCheque Request. Provided Peer Address: %v\n", swarm.Address{})
 	chequebookAddress, _, _ := s.addressbook.Chequebook(BonusPeerAdress)
-	fmt.Printf("ChequeBookAddress to be cashed out: %v\n", chequebookAddress.String())
-	//if err != nil {
-	//	return common.Hash{}, err
-	//}
-	//if !known {
-	//	return common.Hash{}, chequebook.ErrNoCheque
-	//}
-
-	fmt.Printf("Swap Service Cashout is nil:%v\n", s.cashout == nil)
+	s.logger.Tracef("ChequeBookAddress to be cashed out: %v\n", chequebookAddress.Hex())
 	return s.cashout.CashBonusCheque(ctx, chequebookAddress, s.chequebook.Address())
 }
-
 
 // CashoutStatus gets the status of the latest cashout transaction for the peers chequebook
 func (s *Service) CashoutStatus(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error) {

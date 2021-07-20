@@ -20,7 +20,6 @@ type MyTcpProcessor struct {
 	network.DefTcpProcessor
 }
 
-
 func (slf *MyTcpProcessor) OnConnectSucc(session *network.Session) {
 	session.SetWritable(false)
 	log.Info("client connect,session:%d[%s]", session.GetID(), session.RemoteAddr().String())
@@ -70,8 +69,7 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 	peer := swarm.NewAddress(signedCheque.Chequebook.Bytes())
 
 	if err := swap.BonusSwapService.ReceiveBonusCheque(nil, peer, signedCheque); err != nil {
-		log.Error("failed to finally receive and store swap bonus cheque: chequebook:%s, chequeId:%s. ERROR: %w", signedCheque.Chequebook, signedCheque.Id, err)
+		log.Error("xxxxxxxxxx failed to finally receive and store swap bonus cheque: chequebook:%s, chequeId:%s. ERROR: %w", signedCheque.Chequebook, signedCheque.Id, err)
 	}
-	log.Info("swap bonus cheque received and stored successfully: chequebook:%s, chequeId:%s", signedCheque.Chequebook, signedCheque.Id)
+	log.Info("swap bonus cheque received and stored successfully: chequebook:%s, chequeId:%s", signedCheque.Chequebook.Hex(), signedCheque.Id)
 }
-
