@@ -40,7 +40,7 @@ func initbonusChequeTracker(store storage.StateStorer) *bonusChequeTracker {
 			panic(fmt.Errorf("failed to load bonusChequeTracker from storage. Err: %w\n", err))
 		}
 
-	fmt.Printf("loaded bonusChequeTracker: %+v\n", tracker)
+	//fmt.Printf("loaded bonusChequeTracker: %+v\n", tracker)
 	return &tracker
 }
 
@@ -71,6 +71,6 @@ func (b *bonusChequeTracker) store(store storage.StateStorer) error {
 		fmt.Printf("failed to store: %+v. ERROR: %v\n", b, err)
 		return err
 	}
-	fmt.Printf("stored %+v\n", b)
+	//fmt.Printf("stored %+v\n", b)
 	return nil
 }

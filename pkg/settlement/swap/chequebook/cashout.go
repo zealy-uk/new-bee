@@ -185,7 +185,9 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 		return common.Hash{}, err
 	}
 
-	fmt.Printf("Returned cheque to cashout: %v,sig:%x,recipient:%x\n", cheque,cheque.Signature,recipient)
+
+
+	fmt.Printf("*************Returned cheque to cashout: %v,sig:%x,recipient:%x\n", cheque,cheque.Signature,recipient)
 
 	fmt.Printf("Starting call chequebookABI.Pack\n")
 	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
