@@ -38,7 +38,7 @@ type cashoutService struct {
 	backend            transaction.Backend
 	transactionService transaction.Service
 	chequeStore        ChequeStore
-	bonusChequeStore	*BonousChequeStore
+	bonusChequeStore   *BonousChequeStore
 }
 
 // LastCashout contains information about the last cashout
@@ -93,7 +93,7 @@ func NewCashoutService(
 		backend:            backend,
 		transactionService: transactionService,
 		chequeStore:        chequeStore_,
-		bonusChequeStore: bonusChequeStore_,
+		bonusChequeStore:   bonusChequeStore_,
 	}
 }
 
@@ -175,8 +175,8 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 }
 
 // CashBonusCheque sends a cashout transaction for the earliest uncashed cheque of the chequebook
-func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error)  {
-	fmt.Printf("Starting perform cashoutService.CashBonusCheque\n")
+func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error) {
+	fmt.Printf("********* CashBonusCheque chequebook:%s,recipient%s\n", chequebook.String(), recipient.String())
 	chequebookAddr := chequebookT(chequebook.String())
 	fmt.Printf("cashouService bonusChequeStore is nill:%v\n", s.bonusChequeStore == nil)
 	cheque, err := s.bonusChequeStore.ChequeToCashout(chequebookAddr)
@@ -185,9 +185,7 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 		return common.Hash{}, err
 	}
 
-
-
-	fmt.Printf("*************Returned cheque to cashout: %v,sig:%x,recipient:%x\n", cheque,cheque.Signature,recipient)
+	fmt.Printf("*************Returned cheque to cashout: %+v,sig:%x,recipient:%x\n", cheque, cheque.Signature, recipient)
 
 	fmt.Printf("Starting call chequebookABI.Pack\n")
 	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
@@ -209,7 +207,7 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 		Description: "cheque cashout",
 	}
 
-	fmt.Printf("Starting cashoutService.transactionService.Send")
+	fmt.Printf("****************.Send  request:%+v", request)
 	txHash, err := s.transactionService.Send(ctx, request)
 	if err != nil {
 		fmt.Printf("s.transactionService.Send. Error: %v\n", err)
