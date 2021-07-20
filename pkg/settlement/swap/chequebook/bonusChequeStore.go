@@ -206,7 +206,7 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 
 func (r *BonousChequeStore) chequebookCounter(chequebook chequebookT) *bonusChequeTracker {
 	fmt.Printf("called initbonusChequeTracker")
-		res := initbonusChequeTracker(chequebook, r.store)
+		res := initbonusChequeTracker(r.store)
 		fmt.Printf("defaultbonusChequeTracker is nil: %v\n", res == nil)
 		return res
 }
