@@ -85,6 +85,7 @@ func TestCashout(t *testing.T) {
 				return cheque, nil
 			}),
 		),
+		nil,
 	)
 
 	returnedTxHash, err := cashoutService.CashCheque(context.Background(), chequebookAddress, recipientAddress)
@@ -183,6 +184,7 @@ func TestCashoutBounced(t *testing.T) {
 				return cheque, nil
 			}),
 		),
+		nil,
 	)
 
 	returnedTxHash, err := cashoutService.CashCheque(context.Background(), chequebookAddress, recipientAddress)
@@ -266,6 +268,7 @@ func TestCashoutStatusReverted(t *testing.T) {
 				return cheque, nil
 			}),
 		),
+		nil,
 	)
 
 	returnedTxHash, err := cashoutService.CashCheque(context.Background(), chequebookAddress, recipientAddress)
@@ -329,6 +332,7 @@ func TestCashoutStatusPending(t *testing.T) {
 				return cheque, nil
 			}),
 		),
+		nil,
 	)
 
 	returnedTxHash, err := cashoutService.CashCheque(context.Background(), chequebookAddress, recipientAddress)
