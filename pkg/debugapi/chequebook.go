@@ -66,8 +66,16 @@ type chequebookLastChequesResponse struct {
 	LastCheques []chequebookLastChequesPeerResponse `json:"lastcheques"`
 }
 
+type chequebookBonusChequeResponse struct {
+	Beneficiary string         `json:"beneficiary"`
+	Chequebook  string         `json:"chequebook"`
+	Amount      *big.Int `json:"amount"`
+}
+
 type chequebookBonusUncashedChequesResponse struct {
-	BonusUncashedCheques []*chequebook.SignedCheque `json:"bonusuncashedcheques"`
+	TotalUncashedCheques int	`json:"totaluncashedcheques"`
+	TotalUncashedAmount *big.Int `json:"totaluncashedamount"`
+	BonusUncashedCheques []chequebookBonusChequeResponse `json:"bonusuncashedcheques"`
 }
 
 func (s *Service) chequebookBalanceHandler(w http.ResponseWriter, r *http.Request) {
@@ -213,8 +221,23 @@ func (s *Service) chequebookBonusUncashedChequesHandler(w http.ResponseWriter, r
 		return
 	}
 
+	var chequesRsp []chequebookBonusChequeResponse
+	var totalAmount *big.Int
+	for _, cheque := range uncashedCheques {
+		totalAmount = totalAmount.Add(totalAmount, cheque.CumulativePayout)
+		chequesRsp = append(chequesRsp, chequebookBonusChequeResponse{
+			Beneficiary: cheque.Beneficiary.String(),
+			Chequebook: cheque.Chequebook.String(),
+			Amount: cheque.CumulativePayout,
+		})
+	}
+
 	s.logger.Info("✅✅✅✅✅ debug api success: chequebook bonus uncashed cheques")
-	jsonhttp.OK(w, chequebookBonusUncashedChequesResponse{BonusUncashedCheques: uncashedCheques})
+	jsonhttp.OK(w, chequebookBonusUncashedChequesResponse{
+		TotalUncashedCheques: len(chequesRsp),
+		TotalUncashedAmount: totalAmount,
+		BonusUncashedCheques: chequesRsp,
+	})
 }
 
 type swapCashoutResponse struct {

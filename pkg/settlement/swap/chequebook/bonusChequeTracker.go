@@ -41,7 +41,7 @@ func loadBonusChequeTracker(storer storage.StateStorer) *bonusChequeTracker {
 				storer: storer,
 			}
 
-			fmt.Printf("✅✅✅✅✅ new bonusChequeTracker: %+#v\n", btracker_)
+			fmt.Printf("✅✅✅✅✅ new bonusChequeTracker: TotalCheques: %v, CashedIndex: %v\n", tracker_.TotalCheques, tracker_.CashedIndex)
 			return &btracker_
 
 		}
