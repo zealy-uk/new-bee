@@ -106,3 +106,19 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 	fmt.Printf("StoreCashedBonusCheque(%q) completed.\n", cashedChequeKey_)
 	return nil
 }
+
+func (r *BonousChequeStore) BonusReceivedUncashedCheques() ([]*SignedCheque, error)  {
+	keys := r.tracker.uncashedChequeKey()
+	var cheques []*SignedCheque
+	for _, key := range keys {
+		var cheque SignedCheque
+		if err := r.storer.Get(string(key), &cheque); err != nil {
+			if err == storage.ErrNotFound {
+				continue
+			}
+			return nil, err
+		}
+		cheques = append(cheques, &cheque)
+	}
+	return cheques, nil
+}

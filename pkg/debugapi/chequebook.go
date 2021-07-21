@@ -28,6 +28,7 @@ const (
 	errChequebookInsufficientFunds = "insufficient funds"
 	errCantLastChequePeer          = "cannot get last cheque for peer"
 	errCantLastCheque              = "cannot get last cheque for all peers"
+	errCantBonusUncashedCheque     = "cannot get bonus uncashed cheques"
 	errCannotCash                  = "cannot cash cheque"
 	errCannotCashStatus            = "cannot get cashout status"
 	errNoCashout                   = "no prior cashout"
@@ -63,6 +64,10 @@ type chequebookLastChequesPeerResponse struct {
 
 type chequebookLastChequesResponse struct {
 	LastCheques []chequebookLastChequesPeerResponse `json:"lastcheques"`
+}
+
+type chequebookBonusUncashedChequesResponse struct {
+	BonusUncashedCheques []*chequebook.SignedCheque `json:"bonusuncashedcheques"`
 }
 
 func (s *Service) chequebookBalanceHandler(w http.ResponseWriter, r *http.Request) {
@@ -197,6 +202,19 @@ func (s *Service) chequebookAllLastHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	jsonhttp.OK(w, chequebookLastChequesResponse{LastCheques: lcresponses})
+}
+
+func (s *Service) chequebookBonusUncashedChequesHandler(w http.ResponseWriter, r *http.Request) {
+	uncashedCheques, err := s.swap.BonusReceivedUncashedCheques()
+	if err != nil {
+		s.logger.Debugf("debug api: chequebook bonus uncashed cheques: get uncashed cheques: %v", err)
+		s.logger.Errorf("debug api: chequebook bonus uncashed cheques: can't getuncashed cheques: %v", err)
+		jsonhttp.InternalServerError(w, errCantBonusUncashedCheque)
+		return
+	}
+
+	s.logger.Info("✅✅✅✅✅ debug api success: chequebook bonus uncashed cheques")
+	jsonhttp.OK(w, chequebookBonusUncashedChequesResponse{BonusUncashedCheques: uncashedCheques})
 }
 
 type swapCashoutResponse struct {

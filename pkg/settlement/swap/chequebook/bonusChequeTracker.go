@@ -83,3 +83,14 @@ func (b *bonusChequeTracker) store() error {
 	}
 	return nil
 }
+
+func (b *bonusChequeTracker) uncashedChequeKey() []chequeKeyT {
+	if !b.uncashedChequeExists()  {
+		return nil
+	}
+	return b.ChequeKeys[b.CashedIndex+1:]
+}
+
+func (b *bonusChequeTracker) uncashedChequeExists() bool {
+	return b.TotalCheques > 0 && b.CashedIndex < b.TotalCheques-1
+}

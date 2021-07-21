@@ -48,6 +48,9 @@ type ChequeStore interface {
 	// LastCheques returns the last received cheques from every known chequebook.
 	LastCheques() (map[common.Address]*SignedCheque, error)
 
+	BonusReceivedUncashedCheques() ([]*SignedCheque, error)
+
+
 	ChequeToCashout() (*SignedCheque, error)
 	StoreReceivedBonusCheque(cheque *SignedCheque) (*big.Int, error)
 	StoreCashedBonusCheque(cheque *SignedCheque, txhash common.Hash) error
