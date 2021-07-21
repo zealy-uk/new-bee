@@ -71,5 +71,5 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 	if err := swap.BonusSwapService.ReceiveBonusCheque(nil, peer, signedCheque); err != nil {
 		log.Error("xxxxxxxxxx failed to finally receive and store swap bonus cheque: chequebook:%s, chequeId:%s. ERROR: %w", signedCheque.Chequebook, signedCheque.Id, err)
 	}
-	log.Info("swap bonus cheque received and stored successfully: chequebook:%s, chequeId:%s", signedCheque.Chequebook.Hex(), signedCheque.Id)
+	log.Info("✅✅✅✅✅ swap bonus cheque received and stored successfully: chequebook:%s, chequeId:%s", signedCheque.Chequebook.Hex(), signedCheque.Id)
 }
