@@ -375,7 +375,7 @@ func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Ha
 
 func (s *Service) CashBonusCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
 	chequebookAddress, _, _ := s.addressbook.Chequebook(BonusPeerAdress)
-	s.logger.Tracef("ChequeBookAddress to be cashed out: %v\n", chequebookAddress.Hex())
+	s.logger.Infof("ChequeBookAddress to be cashed out: %v\n", chequebookAddress.Hex())
 	return s.cashout.CashBonusCheque(ctx, chequebookAddress, s.chequebook.Address())
 }
 

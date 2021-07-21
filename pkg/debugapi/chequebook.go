@@ -279,7 +279,7 @@ func (s *Service) swapBonusCashoutHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	jsonhttp.OK(w, swapCashoutResponse{TransactionHash: txHash.Hex()})
-	s.logger.Tracef("debug api: bonus cashout success: txHash=%q\n", txHash.Hex())
+	s.logger.Infof("debug api: bonus cashout success: txHash=%q\n", txHash.Hex())
 }
 
 type swapCashoutStatusResult struct {
