@@ -10,16 +10,15 @@ var (
 	xdaiChainID   = int64(100)
 
 	// start block
-	goerliStartBlock = uint64(5148763)
+	goerliStartBlock = uint64(5179062)
 	xdaiStartBlock   = uint64(16515648)
 
 	// factory address
-	goerliContractAddress = common.HexToAddress("0x888E5825Dd6b5fC7e1fC4e32154781820448B1DF")
-	goerliFactoryAddress  = common.HexToAddress("0xCf2875e19F5533be877297210Be8Cdc696Fc4Ae1")
+	goerliContractAddress = common.HexToAddress("0xa4C6a3DBD93Ed887f28E535Aab8b57bf28e0f164")
+	goerliFactoryAddress  = common.HexToAddress("0x168f124967A93327514AAa105Ea8dE20d5c04e1F")
 
-	xdaiContractAddress        = common.HexToAddress("0x0FDc5429C50e2a39066D8A94F3e2D2476fcc3b85")
-	xdaiFactoryAddress         = common.HexToAddress("0xc2d5a532cf69aa9a1378737d8ccdef884b6e7420")
-	goerliLegacyFactoryAddress = common.HexToAddress("0xf0277caffea72734853b834afc9892461ea18474")
+	xdaiContractAddress = common.HexToAddress("0x0FDc5429C50e2a39066D8A94F3e2D2476fcc3b85")
+	xdaiFactoryAddress  = common.HexToAddress("0xc2d5a532cf69aa9a1378737d8ccdef884b6e7420")
 
 	// postage stamp
 	goerliPostageStampContractAddress = common.HexToAddress("0x621e455C4a139f5C4e4A8122Ce55Dc21630769E4")
