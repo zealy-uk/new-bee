@@ -221,8 +221,8 @@ func (s *Service) chequebookBonusUncashedChequesHandler(w http.ResponseWriter, r
 		return
 	}
 
-	var chequesRsp []chequebookBonusChequeResponse
-	var totalAmount *big.Int
+	var chequesRsp = make([]chequebookBonusChequeResponse, 0, 1024)
+	var totalAmount = big.NewInt(0)
 	for _, cheque := range uncashedCheques {
 		totalAmount = totalAmount.Add(totalAmount, cheque.CumulativePayout)
 		chequesRsp = append(chequesRsp, chequebookBonusChequeResponse{
