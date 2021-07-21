@@ -10,10 +10,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/hashicorp/go-multierror"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/newswarm-lab/new-bee/pkg/traversal"
-	"github.com/hashicorp/go-multierror"
 )
 
 // ErrTraversal signals that errors occurred during nodes traversal.

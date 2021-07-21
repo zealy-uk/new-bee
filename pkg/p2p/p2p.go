@@ -11,9 +11,9 @@ import (
 	"io"
 	"time"
 
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/bzz"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	ma "github.com/multiformats/go-multiaddr"
 )
 
 // Service provides methods to handle p2p Peers and Protocols.

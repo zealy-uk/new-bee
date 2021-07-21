@@ -108,9 +108,10 @@ type Bee struct {
 	listenerCloser           io.Closer
 	postageServiceCloser     io.Closer
 	priceOracleCloser        io.Closer
-	bonusClientCloser        io.Closer
-	shutdownInProgress       bool
-	shutdownMutex            sync.Mutex
+	//bonusCloser              io.Closer
+	bonusClientCloser  io.Closer
+	shutdownInProgress bool
+	shutdownMutex      sync.Mutex
 }
 
 type Options struct {
@@ -791,6 +792,14 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 	}
 	p2ps.Ready()
 
+	//ethaddr, _ := signer.EthereumAddress()
+	//peer, _ := swarm.ParseHexAddress(addr)
+	//bns, err := bonus.New(p2pCtx, swapService, peer, overlayEthAddress, ethaddr)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//b.bonusCloser = bns
+
 	return b, nil
 }
 
@@ -914,6 +923,7 @@ func (b *Bee) Shutdown(ctx context.Context) error {
 	tryClose(b.localstoreCloser, "localstore")
 	tryClose(b.errorLogWriter, "error log writer")
 	tryClose(b.resolverCloser, "resolver service")
+	//tryClose(b.bonusCloser, "bonus")
 
 	return mErr
 }

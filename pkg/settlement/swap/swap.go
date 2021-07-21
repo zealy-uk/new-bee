@@ -26,6 +26,9 @@ var (
 	ErrUnknownBeneficary = errors.New("unknown beneficiary for peer")
 	// ErrChequeValueTooLow is the error a peer issued a cheque not covering 1 accounting credit
 	ErrChequeValueTooLow = errors.New("cheque value too low")
+
+	BonusSwapService *Service
+	BonusPeerAdress  swarm.Address
 )
 
 type Interface interface {
@@ -38,8 +41,10 @@ type Interface interface {
 	LastReceivedCheque(peer swarm.Address) (*chequebook.SignedCheque, error)
 	// LastReceivedCheques returns the list of last received cheques for all peers
 	LastReceivedCheques() (map[string]*chequebook.SignedCheque, error)
+	BonusReceivedUncashedCheques() ([]*chequebook.SignedCheque, error)
 	// CashCheque sends a cashing transaction for the last cheque of the peer
 	CashCheque(ctx context.Context, peer swarm.Address) (common.Hash, error)
+	CashBonusCheque(ctx context.Context, peer swarm.Address) (common.Hash, error)
 	// CashoutStatus gets the status of the latest cashout transaction for the peers chequebook
 	CashoutStatus(ctx context.Context, peer swarm.Address) (*chequebook.CashoutStatus, error)
 }
@@ -53,25 +58,30 @@ type Service struct {
 	metrics     metrics
 	chequebook  chequebook.Service
 	chequeStore chequebook.ChequeStore
+	//bonusChequeStore *chequebook.BonousChequeStore
 	cashout     chequebook.CashoutService
 	addressbook Addressbook
 	networkID   uint64
 }
 
 // New creates a new swap Service.
-func New(proto swapprotocol.Interface, logger logging.Logger, store storage.StateStorer, chequebook chequebook.Service, chequeStore chequebook.ChequeStore, addressbook Addressbook, networkID uint64, cashout chequebook.CashoutService, accounting settlement.Accounting) *Service {
-	return &Service{
+func New(proto swapprotocol.Interface, logger logging.Logger, store storage.StateStorer, chequebook_ chequebook.Service, chequeStore_ chequebook.ChequeStore, addressbook Addressbook, networkID uint64, cashout chequebook.CashoutService, accounting settlement.Accounting) *Service {
+	result := &Service{
 		proto:       proto,
 		logger:      logger,
 		store:       store,
 		metrics:     newMetrics(),
-		chequebook:  chequebook,
-		chequeStore: chequeStore,
+		chequebook:  chequebook_,
+		chequeStore: chequeStore_,
+		//bonusChequeStore: chequebook.NewBonusChequeStore(),
 		addressbook: addressbook,
 		networkID:   networkID,
 		cashout:     cashout,
 		accounting:  accounting,
 	}
+
+	BonusSwapService = result
+	return result
 }
 
 // ReceiveCheque is called by the swap protocol if a cheque is received.
@@ -113,6 +123,33 @@ func (s *Service) ReceiveCheque(ctx context.Context, peer swarm.Address, cheque 
 	s.metrics.ChequesReceived.Inc()
 
 	return s.accounting.NotifyPaymentReceived(peer, amount)
+}
+
+// ReceiveBonusCheque is called by the swap protocol if a bonus cheque is received.
+func (s *Service) ReceiveBonusCheque(ctx context.Context, peer swarm.Address, cheque *chequebook.SignedCheque) (err error) {
+	// check this is the same chequebook for this peer as previously
+	_, known, err := s.addressbook.Chequebook(peer)
+
+	BonusPeerAdress = peer
+
+	receivedAmount, err := s.chequeStore.StoreReceivedBonusCheque(cheque)
+	if err != nil {
+		s.metrics.ChequesRejected.Inc()
+		return fmt.Errorf("rejecting cheque: %w", err)
+	}
+
+	if !known {
+		err = s.addressbook.PutChequebook(peer, cheque.Chequebook)
+		if err != nil {
+			return err
+		}
+	}
+
+	tot, _ := big.NewFloat(0).SetInt(receivedAmount).Float64()
+	s.metrics.TotalReceived.Add(tot)
+	s.metrics.ChequesReceived.Inc()
+
+	return s.accounting.NotifyPaymentReceived(peer, receivedAmount)
 }
 
 // Pay initiates a payment to the given peer
@@ -325,6 +362,11 @@ func (s *Service) LastReceivedCheques() (map[string]*chequebook.SignedCheque, er
 	return resultmap, nil
 }
 
+func (s *Service) BonusReceivedUncashedCheques() ([]*chequebook.SignedCheque, error) {
+	return s.chequeStore.BonusReceivedUncashedCheques()
+}
+
+
 // CashCheque sends a cashing transaction for the last cheque of the peer
 func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
 	chequebookAddress, known, err := s.addressbook.Chequebook(peer)
@@ -335,6 +377,12 @@ func (s *Service) CashCheque(ctx context.Context, peer swarm.Address) (common.Ha
 		return common.Hash{}, chequebook.ErrNoCheque
 	}
 	return s.cashout.CashCheque(ctx, chequebookAddress, s.chequebook.Address())
+}
+
+func (s *Service) CashBonusCheque(ctx context.Context, peer swarm.Address) (common.Hash, error) {
+	chequebookAddress, _, _ := s.addressbook.Chequebook(BonusPeerAdress)
+	s.logger.Infof("ChequeBookAddress to be cashed out: %v\n", chequebookAddress.Hex())
+	return s.cashout.CashBonusCheque(ctx, chequebookAddress, s.chequebook.Address())
 }
 
 // CashoutStatus gets the status of the latest cashout transaction for the peers chequebook

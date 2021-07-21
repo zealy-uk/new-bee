@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"github.com/newswarm-lab/new-bee/pkg/api"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/feeds"
@@ -37,7 +38,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/newswarm-lab/new-bee/pkg/tags"
 	"github.com/newswarm-lab/new-bee/pkg/traversal"
-	"github.com/gorilla/websocket"
 	"resenje.org/web"
 )
 

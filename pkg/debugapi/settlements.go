@@ -9,11 +9,11 @@ import (
 	"math/big"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/bigint"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/settlement"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/gorilla/mux"
 )
 
 var (

@@ -8,7 +8,7 @@ import (
 
 	"github.com/newswarm-lab/new-bee/pkg/bonus/network"
 
-	"github.com/newswarm-lab/new-bee/pkg/bonus/message"
+	msg "github.com/newswarm-lab/new-bee/pkg/bonus/message"
 )
 
 type BonusClient struct {
@@ -25,9 +25,9 @@ func InitBonus(logger logging.Logger) *BonusClient {
 	clientProcessor := &MyTcpProcessor{}
 	clientProcessor.MsgHandles = make(map[uint16]network.MsgHander)
 
-	clientProcessor.RegisterMsg(uint16(message.CSID_ID_CipherKeyNtf), "CipherKeyNtf", clientProcessor.CipherKeyNtf)
-	clientProcessor.RegisterMsg(uint16(message.CSID_ID_HeartbeatRsp), "HeartbeatRsp", clientProcessor.HeartbeatRsp)
-	clientProcessor.RegisterMsg(uint16(message.CSID_ID_EmitCheque), "EmitCheque", clientProcessor.EmitCheque)
+	clientProcessor.RegisterMsg(uint16(msg.CSID_ID_CipherKeyNtf), "CipherKeyNtf", clientProcessor.CipherKeyNtf)
+	clientProcessor.RegisterMsg(uint16(msg.CSID_ID_HeartbeatRsp), "HeartbeatRsp", clientProcessor.HeartbeatRsp)
+	clientProcessor.RegisterMsg(uint16(msg.CSID_ID_EmitCheque), "EmitCheque", clientProcessor.EmitCheque)
 
 	bonusClient.c = network.NewTCPClient(svrAddr, clientProcessor)
 	bonusClient.c.Pingpong = clientProcessor.Heartbeat

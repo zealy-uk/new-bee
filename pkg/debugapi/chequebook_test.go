@@ -496,6 +496,31 @@ func TestChequebookCashout(t *testing.T) {
 	}
 }
 
+func TestChequebookBonusCashout(t *testing.T) {
+
+	addr := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")
+	deployCashingHash := common.HexToHash("0xffff")
+
+	cashChequeFunc := func(ctx context.Context, peer swarm.Address) (common.Hash, error) {
+		return deployCashingHash, nil
+	}
+
+	testServer := newTestServer(t, testServerOptions{
+		SwapOpts: []swapmock.Option{swapmock.WithCashChequeFunc(cashChequeFunc)},
+	})
+
+	expected := &debugapi.SwapCashoutResponse{TransactionHash: deployCashingHash.String()}
+
+	var got *debugapi.SwapCashoutResponse
+	jsonhttptest.Request(t, testServer.Client, http.MethodPost, "/chequebook/bonuscashout/"+addr.String(), http.StatusOK,
+		jsonhttptest.WithUnmarshalJSONResponse(&got),
+	)
+
+	if !reflect.DeepEqual(got, expected) {
+		t.Fatalf("Got: \n %+v \n\n Expected: \n %+v \n\n", got, expected)
+	}
+}
+
 func TestChequebookCashout_CustomGas(t *testing.T) {
 
 	addr := swarm.MustParseHexAddress("1000000000000000000000000000000000000000000000000000000000000000")

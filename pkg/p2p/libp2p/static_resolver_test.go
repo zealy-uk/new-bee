@@ -8,8 +8,8 @@ import (
 	"net"
 	"testing"
 
-	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p"
 	ma "github.com/multiformats/go-multiaddr"
+	"github.com/newswarm-lab/new-bee/pkg/p2p/libp2p"
 )
 
 func TestStaticAddressResolver(t *testing.T) {

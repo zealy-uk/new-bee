@@ -8,11 +8,11 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/gorilla/mux"
+	"github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/p2p"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	"github.com/gorilla/mux"
-	"github.com/multiformats/go-multiaddr"
 )
 
 type peerConnectResponse struct {

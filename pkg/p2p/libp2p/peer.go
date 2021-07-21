@@ -10,11 +10,11 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/newswarm-lab/new-bee/pkg/p2p"
-	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/libp2p/go-libp2p-core/network"
 	libp2ppeer "github.com/libp2p/go-libp2p-core/peer"
 	ma "github.com/multiformats/go-multiaddr"
+	"github.com/newswarm-lab/new-bee/pkg/p2p"
+	"github.com/newswarm-lab/new-bee/pkg/swarm"
 )
 
 type peerRegistry struct {

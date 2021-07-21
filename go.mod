@@ -6,9 +6,9 @@ require (
 	github.com/btcsuite/btcd v0.22.0-beta
 	github.com/coreos/go-semver v0.3.0
 	github.com/ethereum/go-ethereum v1.9.23
-	github.com/ethersphere/go-price-oracle-abi v0.1.0
 	github.com/ethersphere/go-storage-incentives-abi v0.3.0
 	github.com/ethersphere/langos v1.0.0
+	github.com/go-ping/ping v0.0.0-20210506233800-ff8be3320020
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-cmp v0.5.5

@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/bzz"
 	"github.com/newswarm-lab/new-bee/pkg/crypto"
 	"github.com/newswarm-lab/new-bee/pkg/debugapi"
@@ -19,7 +20,6 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/p2p"
 	"github.com/newswarm-lab/new-bee/pkg/p2p/mock"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	ma "github.com/multiformats/go-multiaddr"
 )
 
 func TestConnect(t *testing.T) {

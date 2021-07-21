@@ -9,10 +9,10 @@ import (
 	"errors"
 	"time"
 
+	ma "github.com/multiformats/go-multiaddr"
 	"github.com/newswarm-lab/new-bee/pkg/bzz"
 	"github.com/newswarm-lab/new-bee/pkg/p2p"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
-	ma "github.com/multiformats/go-multiaddr"
 )
 
 // Service is the mock of a P2P Service

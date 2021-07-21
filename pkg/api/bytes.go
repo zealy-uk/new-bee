@@ -10,13 +10,13 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/postage"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/newswarm-lab/new-bee/pkg/tags"
 	"github.com/newswarm-lab/new-bee/pkg/tracing"
-	"github.com/gorilla/mux"
 )
 
 type bytesPostResponse struct {

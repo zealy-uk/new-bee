@@ -176,10 +176,21 @@ func (s *Service) newRouter() *mux.Router {
 			"GET": http.HandlerFunc(s.chequebookAllLastHandler),
 		})
 
+		router.Handle("/chequebook/bonusuncashedcheques", jsonhttp.MethodHandler{
+			"GET": http.HandlerFunc(s.chequebookBonusUncashedChequesHandler),
+		})
+
 		router.Handle("/chequebook/cashout/{peer}", jsonhttp.MethodHandler{
 			"GET":  http.HandlerFunc(s.swapCashoutStatusHandler),
 			"POST": http.HandlerFunc(s.swapCashoutHandler),
 		})
+
+		// todo: add swapBonusCashoutStatusHandler
+		router.Handle("/chequebook/bonuscashout/{peer}", jsonhttp.MethodHandler{
+			"GET":  http.HandlerFunc(s.swapCashoutStatusHandler),
+			"POST": http.HandlerFunc(s.swapBonusCashoutHandler),
+		})
+
 	}
 
 	router.Handle("/tags/{id}", jsonhttp.MethodHandler{

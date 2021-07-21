@@ -16,13 +16,13 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/cac"
 	"github.com/newswarm-lab/new-bee/pkg/netstore"
 
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/postage"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/newswarm-lab/new-bee/pkg/tags"
-	"github.com/gorilla/mux"
 )
 
 type chunkAddressResponse struct {

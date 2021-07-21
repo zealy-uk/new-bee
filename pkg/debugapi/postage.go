@@ -12,11 +12,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/newswarm-lab/new-bee/pkg/bigint"
 	"github.com/newswarm-lab/new-bee/pkg/jsonhttp"
 	"github.com/newswarm-lab/new-bee/pkg/postage/postagecontract"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
-	"github.com/gorilla/mux"
 )
 
 type batchID []byte

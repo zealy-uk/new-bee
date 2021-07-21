@@ -16,8 +16,8 @@ import (
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/settlement/swap/chequebook"
 
-	"github.com/newswarm-lab/new-bee/pkg/swarm"
 	"github.com/gorilla/mux"
+	"github.com/newswarm-lab/new-bee/pkg/swarm"
 )
 
 const (
@@ -28,6 +28,7 @@ const (
 	errChequebookInsufficientFunds = "insufficient funds"
 	errCantLastChequePeer          = "cannot get last cheque for peer"
 	errCantLastCheque              = "cannot get last cheque for all peers"
+	errCantBonusUncashedCheque     = "cannot get bonus uncashed cheques"
 	errCannotCash                  = "cannot cash cheque"
 	errCannotCashStatus            = "cannot get cashout status"
 	errNoCashout                   = "no prior cashout"
@@ -63,6 +64,18 @@ type chequebookLastChequesPeerResponse struct {
 
 type chequebookLastChequesResponse struct {
 	LastCheques []chequebookLastChequesPeerResponse `json:"lastcheques"`
+}
+
+type chequebookBonusChequeResponse struct {
+	Beneficiary string         `json:"beneficiary"`
+	Chequebook  string         `json:"chequebook"`
+	Amount      *big.Int `json:"amount"`
+}
+
+type chequebookBonusUncashedChequesResponse struct {
+	TotalUncashedCheques int	`json:"totaluncashedcheques"`
+	TotalUncashedAmount *big.Int `json:"totaluncashedamount"`
+	BonusUncashedCheques []chequebookBonusChequeResponse `json:"bonusuncashedcheques"`
 }
 
 func (s *Service) chequebookBalanceHandler(w http.ResponseWriter, r *http.Request) {
@@ -199,6 +212,34 @@ func (s *Service) chequebookAllLastHandler(w http.ResponseWriter, r *http.Reques
 	jsonhttp.OK(w, chequebookLastChequesResponse{LastCheques: lcresponses})
 }
 
+func (s *Service) chequebookBonusUncashedChequesHandler(w http.ResponseWriter, r *http.Request) {
+	uncashedCheques, err := s.swap.BonusReceivedUncashedCheques()
+	if err != nil {
+		s.logger.Debugf("debug api: chequebook bonus uncashed cheques: get uncashed cheques: %v", err)
+		s.logger.Errorf("debug api: chequebook bonus uncashed cheques: can't getuncashed cheques: %v", err)
+		jsonhttp.InternalServerError(w, errCantBonusUncashedCheque)
+		return
+	}
+
+	var chequesRsp = make([]chequebookBonusChequeResponse, 0, 1024)
+	var totalAmount = big.NewInt(0)
+	for _, cheque := range uncashedCheques {
+		totalAmount = totalAmount.Add(totalAmount, cheque.CumulativePayout)
+		chequesRsp = append(chequesRsp, chequebookBonusChequeResponse{
+			Beneficiary: cheque.Beneficiary.String(),
+			Chequebook: cheque.Chequebook.String(),
+			Amount: cheque.CumulativePayout,
+		})
+	}
+
+	s.logger.Info("✅✅✅✅✅ debug api success: chequebook bonus uncashed cheques")
+	jsonhttp.OK(w, chequebookBonusUncashedChequesResponse{
+		TotalUncashedCheques: len(chequesRsp),
+		TotalUncashedAmount: totalAmount,
+		BonusUncashedCheques: chequesRsp,
+	})
+}
+
 type swapCashoutResponse struct {
 	TransactionHash string `json:"transactionHash"`
 }
@@ -244,6 +285,42 @@ func (s *Service) swapCashoutHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	jsonhttp.OK(w, swapCashoutResponse{TransactionHash: txHash.String()})
+}
+
+func (s *Service) swapBonusCashoutHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	if price, ok := r.Header[gasPriceHeader]; ok {
+		p, ok := big.NewInt(0).SetString(price[0], 10)
+		if !ok {
+			s.logger.Error("debug api: cashout peer: bad gas price")
+			jsonhttp.BadRequest(w, errBadGasPrice)
+			return
+		}
+		ctx = sctx.SetGasPrice(ctx, p)
+	}
+
+	if limit, ok := r.Header[gasLimitHeader]; ok {
+		l, err := strconv.ParseUint(limit[0], 10, 64)
+		if err != nil {
+			s.logger.Debugf("debug api: cashout peer: bad gas limit: %v", err)
+			s.logger.Error("debug api: cashout peer: bad gas limit")
+			jsonhttp.BadRequest(w, errBadGasLimit)
+			return
+		}
+		ctx = sctx.SetGasLimit(ctx, l)
+	}
+
+	addr := "special-addr"
+	txHash, err := s.swap.CashBonusCheque(ctx, swarm.Address{})
+	if err != nil {
+		s.logger.Debugf("debug api: cashout peer: cannot cash %s: %v", addr, err)
+		s.logger.Errorf("debug api: cashout peer: cannot cash %s", addr)
+		jsonhttp.InternalServerError(w, errCannotCash)
+		return
+	}
+
+	jsonhttp.OK(w, swapCashoutResponse{TransactionHash: txHash.Hex()})
+	s.logger.Infof("✅✅✅✅✅ debug api: bonus cashout success: txHash=%q\n", txHash.Hex())
 }
 
 type swapCashoutStatusResult struct {

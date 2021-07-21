@@ -25,7 +25,8 @@ const (
 
 var (
 	// ErrNoCheque is the error returned if there is no prior cheque for a chequebook or beneficiary.
-	ErrNoCheque = errors.New("no cheque")
+	ErrNoCheque      = errors.New("no cheque")
+	ErrNoBonusCheque = errors.New("no bonus cheque")
 	// ErrChequeNotIncreasing is the error returned if the cheque amount is the same or lower.
 	ErrChequeNotIncreasing = errors.New("cheque cumulativePayout is not increasing")
 	// ErrChequeInvalid is the error returned if the cheque itself is invalid.
@@ -46,6 +47,13 @@ type ChequeStore interface {
 	LastCheque(chequebook common.Address) (*SignedCheque, error)
 	// LastCheques returns the last received cheques from every known chequebook.
 	LastCheques() (map[common.Address]*SignedCheque, error)
+
+	BonusReceivedUncashedCheques() ([]*SignedCheque, error)
+
+
+	ChequeToCashout() (*SignedCheque, error)
+	StoreReceivedBonusCheque(cheque *SignedCheque) (*big.Int, error)
+	StoreCashedBonusCheque(cheque *SignedCheque, txhash common.Hash) error
 }
 
 type chequeStore struct {
@@ -56,6 +64,8 @@ type chequeStore struct {
 	transactionService transaction.Service
 	beneficiary        common.Address // the beneficiary we expect in cheques sent to us
 	recoverChequeFunc  RecoverChequeFunc
+
+	*BonousChequeStore
 }
 
 type RecoverChequeFunc func(cheque *SignedCheque, chainID int64) (common.Address, error)
@@ -68,7 +78,7 @@ func NewChequeStore(
 	beneficiary common.Address,
 	transactionService transaction.Service,
 	recoverChequeFunc RecoverChequeFunc) ChequeStore {
-	return &chequeStore{
+	cs := &chequeStore{
 		store:              store,
 		factory:            factory,
 		chaindID:           chainID,
@@ -76,6 +86,8 @@ func NewChequeStore(
 		beneficiary:        beneficiary,
 		recoverChequeFunc:  recoverChequeFunc,
 	}
+	cs.BonousChequeStore = newBonusChequeStore(&cs.lock, cs.store)
+	return cs
 }
 
 // lastReceivedChequeKey computes the key where to store the last cheque received from a chequebook.
