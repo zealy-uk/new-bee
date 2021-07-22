@@ -1,6 +1,6 @@
 package nswabi
 
-const ERC20ABIV0_1_0 = `[
+const ERC20ABIV0_1_0 = ` [
     {
       "inputs": [
         {

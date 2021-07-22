@@ -1,6 +1,6 @@
 package nswabi
 
-const RewardChequeBookABIv0_1_0 = `[
+const RewardChequeBookABIv0_1_0 = ` [
     {
       "inputs": [
         {
