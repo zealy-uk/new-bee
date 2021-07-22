@@ -14,8 +14,8 @@ var (
 	xdaiStartBlock   = uint64(16515648)
 
 	// factory address
-	goerliContractAddress = common.HexToAddress("0xa4C6a3DBD93Ed887f28E535Aab8b57bf28e0f164")
-	goerliFactoryAddress  = common.HexToAddress("0x168f124967A93327514AAa105Ea8dE20d5c04e1F")
+	goerliContractAddress = common.HexToAddress("0x9396153851b81E93aA6f17438E55DBe4850021E4")
+	goerliFactoryAddress  = common.HexToAddress("0x8Ddb3518E5cEdBF9c4e70ABc42c721493AA61e7d")
 
 	xdaiContractAddress = common.HexToAddress("0x0FDc5429C50e2a39066D8A94F3e2D2476fcc3b85")
 	xdaiFactoryAddress  = common.HexToAddress("0xc2d5a532cf69aa9a1378737d8ccdef884b6e7420")
