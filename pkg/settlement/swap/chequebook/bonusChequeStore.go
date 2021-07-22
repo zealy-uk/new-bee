@@ -3,6 +3,7 @@ package chequebook
 import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"math/big"
 	"sync"
@@ -46,14 +47,14 @@ func (r *BonousChequeStore) ChequeToCashout() (*SignedCheque, error) {
 
 	chequeK, err := r.tracker.chequeToCashout()
 	if err != nil {
-		fmt.Printf("xxxxxxxxxx chequeToCashout() failed. Err: %v\n", err)
+		log.Error("xxxxxxxxxx chequeToCashout() failed. Err: %v\n", err)
 		return nil, err
 	}
 
 	var cheque SignedCheque
 
 	if err := r.storer.Get(string(chequeK), &cheque); err != nil {
-		fmt.Printf("xxxxxxxxxx BonusStateStorer.Get() failed. Err:%v\n", err)
+		log.Error("xxxxxxxxxx BonusStateStorer.Get() failed. Err:%v\n", err)
 		return nil, err
 	}
 
@@ -69,12 +70,12 @@ func (r *BonousChequeStore) StoreReceivedBonusCheque(cheque *SignedCheque) (*big
 	chequeKey := bonusReceivedChequeKey(chequebook, cheque.Id.Int64())
 
 	if err := r.storer.Put(string(chequeKey), cheque); err != nil {
-		fmt.Printf("xxxxxxxxxx failed to store cheque:%q\n", chequeKey)
+		log.Error("xxxxxxxxxx failed to store cheque:%q\n", chequeKey)
 		return nil, err
 	}
 
 	if err := r.tracker.receiveOneCheque(chequeKey).store(); err != nil {
-		fmt.Printf("xxxxxxxxxx failed to store bonusChequeTracker.\n")
+		log.Error("xxxxxxxxxx failed to store bonusChequeTracker.\n")
 		return nil, err
 	}
 
@@ -93,12 +94,12 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 		TxHash: txhash,
 		Cheque: *cheque,
 	}); err != nil {
-		fmt.Printf("xxxxxxxxxx failed to store cashed bonus cheque %q.\n", cashedChequeKey_)
+		log.Error("xxxxxxxxxx failed to store cashed bonus cheque %q.\n", cashedChequeKey_)
 		return err
 	}
 
 	if err := r.tracker.confirmChequeToCashout().store(); err != nil {
-		fmt.Printf("xxxxxxxxxx failed to store bonusChequeTracker.\n")
+		log.Error("xxxxxxxxxx failed to store bonusChequeTracker.\n")
 		return err
 	}
 

@@ -59,7 +59,6 @@ func (b *bonusChequeTracker) receiveOneCheque(chequeK chequeKeyT) *bonusChequeTr
 	return b
 }
 
-// if "" returned, it implies that temporarily no available cheque for cash out.
 func (b *bonusChequeTracker) chequeToCashout() (chequeKeyT, error) {
 	if b.TotalCheques < 1 || b.CashedIndex == b.TotalCheques-1 {
 		return "", ErrNoCashableCheque

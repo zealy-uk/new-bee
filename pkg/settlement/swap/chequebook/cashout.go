@@ -14,6 +14,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/newswarm-lab/new-bee/pkg/bonus/log"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/storage"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
@@ -175,13 +176,13 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error) {
 	cheque, err := s.chequeStore.ChequeToCashout()
 	if err != nil {
-		fmt.Printf("xxxxxxxxxx bonusChequeStore.ChequeToCashout() failed. Error: %v\n", err)
+		log.Error("xxxxxxxxxx bonusChequeStore.ChequeToCashout() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
 	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
 	if err != nil {
-		fmt.Printf("xxxxxxxxxx chequebookABI.Pack() failed. Error: %v\n", err)
+		log.Error("xxxxxxxxxx chequebookABI.Pack() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 	lim := sctx.GetGasLimit(ctx)
@@ -199,12 +200,12 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 
 	txHash, err := s.transactionService.Send(ctx, request)
 	if err != nil {
-		fmt.Printf("xxxxxxxxxx transactionService.Send() failed. Error: %v\n", err)
+		log.Error("xxxxxxxxxx transactionService.Send() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
 	if err = s.chequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
-		fmt.Printf("xxxxxxxxxx bonusChequeStore.StoreCashedBonusCheque() failed. Error: %v\n", err)
+		log.Error("xxxxxxxxxx bonusChequeStore.StoreCashedBonusCheque() failed. Error: %v\n", err)
 		return txHash, err
 	}
 
