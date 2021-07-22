@@ -19,7 +19,6 @@ type BonusClient struct {
 func InitBonus(logger logging.Logger) *BonusClient {
 	bonusClient := &BonusClient{}
 
-	svrAddr := "139.162.90.128:9527"
 	log.Init(logger)
 
 	clientProcessor := &MyTcpProcessor{}
@@ -29,7 +28,7 @@ func InitBonus(logger logging.Logger) *BonusClient {
 	clientProcessor.RegisterMsg(uint16(msg.CSID_ID_HeartbeatRsp), "HeartbeatRsp", clientProcessor.HeartbeatRsp)
 	clientProcessor.RegisterMsg(uint16(msg.CSID_ID_EmitCheque), "EmitCheque", clientProcessor.EmitCheque)
 
-	bonusClient.c = network.NewTCPClient(svrAddr, clientProcessor)
+	bonusClient.c = network.NewTCPClient("", clientProcessor)
 	bonusClient.c.Pingpong = clientProcessor.Heartbeat
 	bonusClient.c.PingpongInterval = 15
 	bonusClient.c.AutoReconnect = true

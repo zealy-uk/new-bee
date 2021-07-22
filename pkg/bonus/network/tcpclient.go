@@ -2,6 +2,7 @@ package network
 
 import (
 	"errors"
+	"github.com/newswarm-lab/new-bee/pkg/bonus"
 	"net"
 	"sync"
 	"time"
@@ -74,17 +75,43 @@ func (slf *TCPClient) WriteMsg(msg []byte) error {
 }
 
 func (slf *TCPClient) Start() {
-reConnect:
-	conn, err := net.Dial("tcp", slf.DstAddr)
-	if err != nil {
-		log.Error("connect tcp server error: %v", err)
-		if slf.AutoReconnect && !slf.closeFlag {
-			time.Sleep(1 * time.Second)
-			goto reConnect
-		} else {
-			return
+	var url = "testapi.newswarm.info"
+	var conn net.Conn
+	var addr string
+	var err error
+	var switchAddr bool = true
+
+	reConnect:
+	for {
+		// switch to a new address
+		if switchAddr {
+			log.Warn("start picking an address and dial.")
+			addr, conn = bonus.WrappedDialAfterPing(url)
+			log.Info("✅ bonus connected to %v\n", addr)
+			switchAddr = false
+			break
 		}
+
+		// reconnect a address
+		var connected bool
+		for i :=0; i < 5; i++ {
+			conn, err = net.Dial("tcp", addr)
+			if err == nil {
+				connected = true
+				break
+			}
+
+			log.Error("failed to connect %v, error: %v", addr, err)
+			<-time.After(time.Second)
+		}
+
+		if connected {
+			break
+		}
+
+		switchAddr = true
 	}
+
 	slf.Lock()
 	if slf.closeFlag {
 		slf.Unlock()
@@ -94,8 +121,9 @@ reConnect:
 	slf.session.SetPingPong(slf.Pingpong, slf.PingpongInterval)
 	slf.Unlock()
 	slf.session.Start()
+
 	if slf.AutoReconnect && !slf.closeFlag {
-		time.Sleep(1 * time.Second)
+		<-time.After(time.Second)
 		goto reConnect
 	}
 }
