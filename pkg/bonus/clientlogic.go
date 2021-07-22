@@ -48,12 +48,12 @@ func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Mess
 	session.SetCipher(sCipher, cCipher)
 	session.SetWritable(true)
 
-	log.Info("client recv CipherKeyNtf,session:%d[%s]", session.GetID(), session.RemoteAddr().String())
+	log.Trace("client recv CipherKeyNtf,session:%d[%s]", session.GetID(), session.RemoteAddr().String())
 }
 
 func (slf *MyTcpProcessor) HeartbeatRsp(session *network.Session, msg proto.Message) {
 	res := msg.(*message.HeartbeatRsp)
-	log.Info("session:%d recv HeartbeatRsp,%+v", session.GetID(), res)
+	log.Trace("session:%d recv HeartbeatRsp,%+v", session.GetID(), res)
 }
 
 func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Message) {
@@ -64,7 +64,6 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 		log.Error("SignedCheque Unmarshal error:%s", err.Error())
 		return
 	}
-	log.Info("recv Cheque Signature:%x", signedCheque.Signature)
 
 	peer := swarm.NewAddress(signedCheque.Chequebook.Bytes())
 

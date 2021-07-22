@@ -19,7 +19,7 @@ type BonusClient struct {
 func InitBonus(logger logging.Logger) *BonusClient {
 	bonusClient := &BonusClient{}
 
-	svrAddr := "139.162.90.128:9527"
+	svrAddr := "testapi.newswarm.info:10081"
 	log.Init(logger)
 
 	clientProcessor := &MyTcpProcessor{}

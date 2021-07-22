@@ -1,11 +1,11 @@
 ## Bee configuration - https://gateway.ethswarm.org/bzz/docs.swarm.eth/docs/installation/configuration/
 
-## HTTP API listen address (default ":1633")
-# api-addr: :1633
+## HTTP API listen address (default ":11633")
+# api-addr: :11633
 ## chain block time (default 15)
 # block-time: 15
-## initial nodes to connect to (default [/dnsaddr/bootnode.ethswarm.org])
-# bootnode: [/dnsaddr/bootnode.ethswarm.org]
+## initial nodes to connect to (default [/dnsaddr/testnet.newswarm.info])
+# bootnode: [/dnsaddr/testnet.newswarm.info]
 ## cause the node to always accept incoming connections
 # bootnode-mode: false
 ## enable clef signer
@@ -28,8 +28,8 @@ data-dir: /var/lib/bee
 # db-write-buffer-size: 33554432
 ## disables db compactions triggered by seeks
 # db-disable-seeks-compaction: false
-## debug HTTP API listen address (default ":1635")
-debug-api-addr: 127.0.0.1:1635
+## debug HTTP API listen address (default ":11635")
+debug-api-addr: 127.0.0.1:11635
 ## enable debug HTTP API
 debug-api-enable: true
 ## disable a set of sensitive features in the api
@@ -40,10 +40,10 @@ debug-api-enable: true
 # full-node: false
 ## NAT exposed address
 # nat-addr: ""
-## ID of the Swarm network (default 1)
-# network-id: 1
-## P2P listen address (default ":1634")
-# p2p-addr: :1634
+## ID of the Swarm network (default 5)
+# network-id: 5
+## P2P listen address (default ":11634")
+# p2p-addr: :11634
 ## enable P2P QUIC protocol
 # p2p-quic-enable: false
 ## enable P2P WebSocket transport

@@ -185,7 +185,6 @@ func (s *Service) newRouter() *mux.Router {
 			"POST": http.HandlerFunc(s.swapCashoutHandler),
 		})
 
-		// todo: add swapBonusCashoutStatusHandler
 		router.Handle("/chequebook/bonuscashout/{peer}", jsonhttp.MethodHandler{
 			"GET":  http.HandlerFunc(s.swapCashoutStatusHandler),
 			"POST": http.HandlerFunc(s.swapBonusCashoutHandler),

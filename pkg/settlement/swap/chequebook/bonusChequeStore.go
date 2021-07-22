@@ -78,7 +78,6 @@ func (r *BonousChequeStore) StoreReceivedBonusCheque(cheque *SignedCheque) (*big
 		return nil, err
 	}
 
-	fmt.Printf("StoreReceivedBonusCheque(%q) completed.\n", chequeKey)
 	return cheque.CumulativePayout, nil
 }
 
@@ -103,7 +102,6 @@ func (r *BonousChequeStore) StoreCashedBonusCheque(cheque *SignedCheque, txhash 
 		return err
 	}
 
-	fmt.Printf("StoreCashedBonusCheque(%q) completed.\n", cashedChequeKey_)
 	return nil
 }
 
