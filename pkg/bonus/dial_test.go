@@ -27,13 +27,21 @@ func TestDialAfterPing(t *testing.T) {
 	t.Logf("Connect remote %v\n", conn.RemoteAddr())
 }
 
-func TestAddrsFn(t *testing.T) {url := "testnet.newswarm.info"
+func TestAddrsFn(t *testing.T) {
+	url := "http://testapi.newswarm.info:10080/nodelist"
 	addrPortMp := addrsFn(url, time.Second * 5)
 	t.Logf("addrsFn result: %v\n", addrPortMp)
 }
 
 func TestWrappedDialAfterPing(t *testing.T)  {
-	url := "testapi.newswarm.info"
+	url := "http://testapi.newswarm.info:10080/nodelist"
 	addr, conn:= WrappedDialAfterPing(url)
+	t.Logf("connect to %v, connection: %v\n", addr, conn)
+}
+
+
+func TestWrappedDialADyn(t *testing.T) {
+	url := "http://testapi.newswarm.info:10080/nodelist"
+	addr, conn:= WrappedDialADyn(url)
 	t.Logf("connect to %v, connection: %v\n", addr, conn)
 }

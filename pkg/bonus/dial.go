@@ -47,6 +47,49 @@ func Dial(addrs map[string]string, retryInterval, dialTimeout time.Duration) net
 	}
 }
 
+// WrappedDialADyn wraps DialWithDynamicAddrs function
+func WrappedDialADyn(url string) (string, net.Conn) {
+	return DialWithDynamicAddrs(url, addrsFn, time.Minute*5, time.Second*10)
+}
+
+// DialWithDynamicAddrs performs like Dial but it depends on addrsFn to retry refreshed addresses.
+func DialWithDynamicAddrs(url string, addrsFn addrsFnT, retryInterval, dialTimeout time.Duration) (string, net.Conn) {
+retrieveAddrs:
+	addrs := addrsFn(url, retryInterval)
+	type addrT struct {
+		addr string
+		port string
+	}
+	addrsD := make([]addrT, 0, len(addrs))
+	for addr, port := range addrs {
+		addrsD = append(addrsD, addrT{addr, port})
+	}
+
+	//for {
+		rand.Seed(86)
+		for len(addrsD) > 0 {
+			i := rand.Intn(len(addrsD))
+			addr := addrsD[i].addr + ":" + addrsD[i].port
+
+			log.Printf("start dailing %v\n", addr)
+			conn, err := net.DialTimeout("tcp", addr, dialTimeout)
+			if err != nil {
+				log.Printf("failed to dial %v. ERROR: %v\n", addr, err)
+				addrsD = append(addrsD[0:i], addrsD[i+1:]...)
+				continue
+			}
+
+			log.Printf("successfully to connect %v\n", addr)
+			return addr, conn
+		}
+
+		log.Printf("failed to dial any endpoint. \n Program will retry after %v\n", retryInterval)
+		<-time.After(retryInterval)
+		goto retrieveAddrs
+	//}
+}
+
+
 // DialAfterPing performs like Dial but it works on addresses that Ping successfully.
 func DialAfterPing(addrs map[string]string, retryInterval, dialTimeout, pingTimeout time.Duration) net.Conn {
 	addrsP := make([]string, 0, len(addrs))
