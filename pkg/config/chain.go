@@ -14,8 +14,9 @@ var (
 	xdaiStartBlock   = uint64(16515648)
 
 	// factory address
-	goerliContractAddress = common.HexToAddress("0x2bABAbaCcb615275E68168FB51609Ff08E21889A")
-	goerliFactoryAddress  = common.HexToAddress("0x539F6636e068d194E2b8737C4d66fD2A89e73657")
+	goerliContractAddress            = common.HexToAddress("0x2bABAbaCcb615275E68168FB51609Ff08E21889A")
+	goerliFactoryAddress             = common.HexToAddress("0x539F6636e068d194E2b8737C4d66fD2A89e73657")
+	goerliPriceOracleContractAddress = common.HexToAddress("0xBcD55D9B095E91FA84A127cf36a2039Ed7896366")
 
 	xdaiContractAddress = common.HexToAddress("0x0FDc5429C50e2a39066D8A94F3e2D2476fcc3b85")
 	xdaiFactoryAddress  = common.HexToAddress("0xc2d5a532cf69aa9a1378737d8ccdef884b6e7420")
@@ -41,7 +42,7 @@ func GetChainConfig(chainID int64) (*ChainConfig, bool) {
 		cfg.StartBlock = goerliStartBlock
 		cfg.CurrentFactory = goerliFactoryAddress
 		cfg.LegacyFactories = []common.Address{}
-		cfg.PriceOracleAddress = goerliContractAddress
+		cfg.PriceOracleAddress = goerliPriceOracleContractAddress
 		return &cfg, true
 	case xdaiChainID:
 		cfg.PostageStamp = xdaiPostageStampContractAddress
