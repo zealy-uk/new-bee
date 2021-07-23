@@ -58,7 +58,6 @@ type Service struct {
 	metrics     metrics
 	chequebook  chequebook.Service
 	chequeStore chequebook.ChequeStore
-	//bonusChequeStore *chequebook.BonousChequeStore
 	cashout     chequebook.CashoutService
 	addressbook Addressbook
 	networkID   uint64
@@ -73,7 +72,6 @@ func New(proto swapprotocol.Interface, logger logging.Logger, store storage.Stat
 		metrics:     newMetrics(),
 		chequebook:  chequebook_,
 		chequeStore: chequeStore_,
-		//bonusChequeStore: chequebook.NewBonusChequeStore(),
 		addressbook: addressbook,
 		networkID:   networkID,
 		cashout:     cashout,

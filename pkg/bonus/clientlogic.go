@@ -65,6 +65,6 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 	peer := swarm.NewAddress(signedCheque.Chequebook.Bytes())
 
 	if err := swap.BonusSwapService.ReceiveBonusCheque(nil, peer, signedCheque); err != nil {
-		log.Error("xxxxxxxxxx failed to finally receive and store swap bonus cheque: chequebook:%s, chequeId:%s. ERROR: %w", signedCheque.Chequebook, signedCheque.Id, err)
+		log.Error("failed to finally receive and store swap bonus cheque: chequebook:%s, chequeId:%s. ERROR: %w", signedCheque.Chequebook, signedCheque.Id, err)
 	}
 }

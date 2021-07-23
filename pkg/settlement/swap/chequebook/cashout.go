@@ -176,13 +176,13 @@ func (s *cashoutService) CashCheque(ctx context.Context, chequebook, recipient c
 func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipient common.Address) (common.Hash, error) {
 	cheque, err := s.chequeStore.ChequeToCashout()
 	if err != nil {
-		log.Error("xxxxxxxxxx bonusChequeStore.ChequeToCashout() failed. Error: %v\n", err)
+		log.Error("bonusChequeStore.ChequeToCashout() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
 	callData, err := chequebookABI.Pack("cashChequeBeneficiary", recipient, cheque.CumulativePayout, cheque.Id, cheque.Signature)
 	if err != nil {
-		log.Error("xxxxxxxxxx chequebookABI.Pack() failed. Error: %v\n", err)
+		log.Error("chequebookABI.Pack() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 	lim := sctx.GetGasLimit(ctx)
@@ -200,12 +200,12 @@ func (s *cashoutService) CashBonusCheque(ctx context.Context, chequebook, recipi
 
 	txHash, err := s.transactionService.Send(ctx, request)
 	if err != nil {
-		log.Error("xxxxxxxxxx transactionService.Send() failed. Error: %v\n", err)
+		log.Error("transactionService.Send() failed. Error: %v\n", err)
 		return common.Hash{}, err
 	}
 
 	if err = s.chequeStore.StoreCashedBonusCheque(cheque, txHash); err != nil {
-		log.Error("xxxxxxxxxx bonusChequeStore.StoreCashedBonusCheque() failed. Error: %v\n", err)
+		log.Error("bonusChequeStore.StoreCashedBonusCheque() failed. Error: %v\n", err)
 		return txHash, err
 	}
 

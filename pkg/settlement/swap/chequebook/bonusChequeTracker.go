@@ -44,7 +44,7 @@ func loadBonusChequeTracker(storer storage.StateStorer) *bonusChequeTracker {
 			return &btracker_
 
 		}
-		panic(fmt.Errorf("xxxxxxxxxx failed to load bonusChequeTracker from storage. Err: %w\n", err))
+		panic(fmt.Errorf("failed to load bonusChequeTracker from storage. Err: %w\n", err))
 	}
 
 	return &bonusChequeTracker{
