@@ -107,7 +107,7 @@ damage to hardware or loss of funds associated with the Ethereum account connect
 No developers or entity involved will be liable for any claims and damages associated with your use,
 inability to use, or your interaction with other nodes or the software.`)
 
-			fmt.Printf("\n\nversion: %v - planned to be supported until %v, please follow https://ethswarm.org/\n\n", bee.Version, endSupportDate())
+			fmt.Printf("\n\nversion: %v - planned to be supported until %v, please follow https://www.newswarm.info/\n\n", bee.Version, endSupportDate())
 
 			debugAPIAddr := c.config.GetString(optionNameDebugAPIAddr)
 			if !c.config.GetBool(optionNameDebugAPIEnable) {
@@ -452,7 +452,7 @@ func getConfigByNetworkID(networkID uint64, defaultBlockTime uint64) *networkCon
 	}
 	switch networkID {
 	case 1:
-		config.bootNodes = []string{"/dnsaddr/mainnet.ethswarm.org"}
+		config.bootNodes = []string{"/dnsaddr/testnet.newswarm.info"}
 		config.blockTime = uint64(5 * time.Second)
 		config.chainID = 100
 	case 5: //staging

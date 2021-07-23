@@ -41,14 +41,12 @@ func loadBonusChequeTracker(storer storage.StateStorer) *bonusChequeTracker {
 				storer: storer,
 			}
 
-			fmt.Printf("✅✅✅✅✅ new bonusChequeTracker: TotalCheques: %v, CashedIndex: %v\n", tracker_.TotalCheques, tracker_.CashedIndex)
 			return &btracker_
 
 		}
 		panic(fmt.Errorf("xxxxxxxxxx failed to load bonusChequeTracker from storage. Err: %w\n", err))
 	}
 
-	fmt.Printf("✅✅✅✅✅ loaded bonusChequeTracker. TotalCheques: %v, CashedIndex: %v\n", tracker_.TotalCheques, tracker_.CashedIndex)
 	return &bonusChequeTracker{
 		tracker: &tracker_,
 		storer:  storer,
@@ -58,11 +56,9 @@ func loadBonusChequeTracker(storer storage.StateStorer) *bonusChequeTracker {
 func (b *bonusChequeTracker) receiveOneCheque(chequeK chequeKeyT) *bonusChequeTracker {
 	b.ChequeKeys = append(b.ChequeKeys, chequeK)
 	b.TotalCheques++
-	fmt.Printf("✅✅✅✅✅ cheque %q cached. totalCheques=%d, cashedIndex=%d\n", chequeK, b.TotalCheques, b.CashedIndex)
 	return b
 }
 
-// if "" returned, it implies that temporarily no available cheque for cash out.
 func (b *bonusChequeTracker) chequeToCashout() (chequeKeyT, error) {
 	if b.TotalCheques < 1 || b.CashedIndex == b.TotalCheques-1 {
 		return "", ErrNoCashableCheque

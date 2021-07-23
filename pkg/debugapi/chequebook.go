@@ -232,7 +232,7 @@ func (s *Service) chequebookBonusUncashedChequesHandler(w http.ResponseWriter, r
 		})
 	}
 
-	s.logger.Info("✅✅✅✅✅ debug api success: chequebook bonus uncashed cheques")
+	s.logger.Info("success to chequebook bonus uncashed cheques")
 	jsonhttp.OK(w, chequebookBonusUncashedChequesResponse{
 		TotalUncashedCheques: len(chequesRsp),
 		TotalUncashedAmount: totalAmount,
@@ -320,7 +320,7 @@ func (s *Service) swapBonusCashoutHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	jsonhttp.OK(w, swapCashoutResponse{TransactionHash: txHash.Hex()})
-	s.logger.Infof("✅✅✅✅✅ debug api: bonus cashout success: txHash=%q\n", txHash.Hex())
+	s.logger.Infof("bonus cashout success: txHash=%q\n", txHash.Hex())
 }
 
 type swapCashoutStatusResult struct {

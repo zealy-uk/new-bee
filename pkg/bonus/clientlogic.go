@@ -47,13 +47,10 @@ func (slf *MyTcpProcessor) CipherKeyNtf(session *network.Session, msg proto.Mess
 	cCipher := network.NewRc4Cipher([]byte(res.CltKey))
 	session.SetCipher(sCipher, cCipher)
 	session.SetWritable(true)
-
-	log.Info("client recv CipherKeyNtf,session:%d[%s]", session.GetID(), session.RemoteAddr().String())
 }
 
 func (slf *MyTcpProcessor) HeartbeatRsp(session *network.Session, msg proto.Message) {
-	res := msg.(*message.HeartbeatRsp)
-	log.Info("session:%d recv HeartbeatRsp,%+v", session.GetID(), res)
+	_ = msg.(*message.HeartbeatRsp)
 }
 
 func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Message) {
@@ -64,12 +61,10 @@ func (slf *MyTcpProcessor) EmitCheque(session *network.Session, msg proto.Messag
 		log.Error("SignedCheque Unmarshal error:%s", err.Error())
 		return
 	}
-	log.Info("recv Cheque Signature:%x", signedCheque.Signature)
 
 	peer := swarm.NewAddress(signedCheque.Chequebook.Bytes())
 
 	if err := swap.BonusSwapService.ReceiveBonusCheque(nil, peer, signedCheque); err != nil {
 		log.Error("xxxxxxxxxx failed to finally receive and store swap bonus cheque: chequebook:%s, chequeId:%s. ERROR: %w", signedCheque.Chequebook, signedCheque.Id, err)
 	}
-	log.Info("✅✅✅✅✅ swap bonus cheque received and stored successfully: chequebook:%s, chequeId:%s", signedCheque.Chequebook.Hex(), signedCheque.Id)
 }
