@@ -74,7 +74,6 @@ func (slf *TCPClient) WriteMsg(msg []byte) error {
 }
 
 func (slf *TCPClient) Start() {
-	//var url = "testapi.newswarm.info"
 	var conn net.Conn
 	var addr string
 	var err error
@@ -84,9 +83,13 @@ func (slf *TCPClient) Start() {
 	for {
 		// switch to a new address
 		if switchAddr {
-			log.Warn("start picking an address and dial.")
-			//addr, conn = bonus.WrappedDialAfterPing(url)
-			log.Info("✅ bonus connected to %v\n", addr)
+			addr, conn, err = dial()
+			if err != nil {
+				log.Error("failed to switch connection", err)
+				<-time.After(time.Second * 10)
+				continue
+			}
+			log.Info("bonus connected to %v\n", addr)
 			switchAddr = false
 			break
 		}

@@ -1,4 +1,4 @@
-package bonus
+package network
 
 import (
 	"testing"
