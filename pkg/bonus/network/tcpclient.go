@@ -79,31 +79,32 @@ func (slf *TCPClient) Start() {
 	var err error
 	var switchAddr bool = true
 
-	reConnect:
+reConnect:
 	for {
 		// switch to a new address
 		if switchAddr {
 			addr, conn, err = dial()
 			if err != nil {
-				log.Error("failed to switch connection", err)
+				log.Error("failed to start new bonus connection", err)
 				<-time.After(time.Second * 10)
 				continue
 			}
-			log.Info("bonus connected to %v\n", addr)
+			log.Info("new bonus connected to %v\n", addr)
 			switchAddr = false
 			break
 		}
 
 		// reconnect a address
 		var connected bool
-		for i :=0; i < 5; i++ {
+		for i := 0; i < 5; i++ {
 			conn, err = net.Dial("tcp", addr)
 			if err == nil {
+				log.Info("bonus reconnected to %v\n", addr)
 				connected = true
 				break
 			}
 
-			log.Error("failed to connect %v, error: %v", addr, err)
+			log.Error("failed to bonus reconnect %v, error: %v", addr, err)
 			<-time.After(time.Second)
 		}
 
