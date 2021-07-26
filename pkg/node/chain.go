@@ -152,6 +152,11 @@ func InitChequebookService(
 		ctx = sctx.SetGasPrice(ctx, gasPrice)
 	}
 
+	minDeposit := big.NewInt(3000000000000000000)
+	if lt := deposit.Cmp(minDeposit) < 0; lt {
+		return nil, fmt.Errorf("deposit %s too low, minimal value is 3000000000000000000", initialDeposit)
+	}
+
 	chequebookService, err := chequebook.Init(
 		ctx,
 		chequebookFactory,
