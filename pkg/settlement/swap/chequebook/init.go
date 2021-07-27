@@ -179,22 +179,33 @@ func Init(
 			return nil, err
 		}
 
-		if swapInitialDeposit.Cmp(big.NewInt(0)) != 0 {
-			logger.Infof("depositing %d token into new chequebook", swapInitialDeposit)
-			depositHash, err := chequebookService.Deposit(ctx, swapInitialDeposit)
-			if err != nil {
-				return nil, err
-			}
+		/*
+			if swapInitialDeposit.Cmp(big.NewInt(0)) != 0 {
+				logger.Infof("depositing %d token into new chequebook", swapInitialDeposit)
+				depositHash, err := chequebookService.Deposit(ctx, swapInitialDeposit)
+				if err != nil {
+					return nil, err
+				}
 
-			logger.Infof("sent deposit transaction %x", depositHash)
-			err = chequebookService.WaitForDeposit(ctx, depositHash)
-			if err != nil {
-				return nil, err
-			}
+				logger.Infof("sent deposit transaction %x", depositHash)
+				err = chequebookService.WaitForDeposit(ctx, depositHash)
+				if err != nil {
+					return nil, err
+				}
 
-			logger.Info("successfully deposited to chequebook")
-		}
+				logger.Info("successfully deposited to chequebook")
+			}*/
 	} else {
+		//todo check deposit
+		balance, err := erc20Service.BalanceOf(context.Background(), chequebookAddress)
+		if err != nil {
+			return nil, err
+		}
+
+		if swapInitialDeposit.Cmp(balance) > 0 {
+			return nil, fmt.Errorf("chequebookAddr %s need balance %s, now got %s", chequebookAddress.String(), swapInitialDeposit.String(), balance.String())
+		}
+
 		chequebookService, err = New(transactionService, chequebookAddress, overlayEthAddress, stateStore, chequeSigner, erc20Service)
 		if err != nil {
 			return nil, err

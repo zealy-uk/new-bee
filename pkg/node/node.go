@@ -506,6 +506,7 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 			}
 
 			bootnodes = append(bootnodes, addr)
+			logger.Debugf("**************multiaddress %s: %+v", a, addr)
 		}
 	}
 
