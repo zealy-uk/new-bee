@@ -15,7 +15,7 @@ var (
 
 	// factory address
 	goerliContractAddress            = common.HexToAddress("0x5E4B0229565643fD9f5613aBf4B1498598033445")
-	goerliFactoryAddress             = common.HexToAddress("0x3CbEb3366AE19E12c3Bef78a1eee974416606357")
+	goerliFactoryAddress             = common.HexToAddress("0x0B69bf9Fc8aF7C8A8e7c356b78b48E60C97aA558")
 	goerliPriceOracleContractAddress = common.HexToAddress("0x17C757d9E50300b46BB55a2dD89a474238e108b6")
 
 	xdaiContractAddress = common.HexToAddress("0x0FDc5429C50e2a39066D8A94F3e2D2476fcc3b85")
