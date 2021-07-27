@@ -60,7 +60,7 @@ func checkBalance(
 		insufficientETH := ethBalance.Cmp(minimumEth) < 0
 
 		if insufficientERC20 || insufficientETH {
-			neededERC20, mod := new(big.Int).DivMod(swapInitialDeposit, big.NewInt(10000000000000000), new(big.Int))
+			neededERC20, mod := new(big.Int).DivMod(swapInitialDeposit, big.NewInt(1000000000000000000), new(big.Int))
 			if mod.Cmp(big.NewInt(0)) > 0 {
 				// always round up the division as the bzzaar cannot handle decimals
 				neededERC20.Add(neededERC20, big.NewInt(1))
@@ -71,7 +71,7 @@ func checkBalance(
 			} else if insufficientETH {
 				logger.Warningf("cannot continue until there is sufficient ETH (for Gas) available on %x", overlayEthAddress)
 			} else {
-				logger.Warningf("cannot continue until there is at least %d BZZ available on %x", neededERC20, overlayEthAddress)
+				logger.Warningf("cannot continue until there is at least %d FBZZ available on %x", neededERC20, overlayEthAddress)
 			}
 			if chainId == 5 {
 				logger.Warningf("learn how to fund your node by visiting our docs at https://docs.ethswarm.org/docs/installation/fund-your-node")
@@ -211,7 +211,7 @@ func Init(
 			return nil, err
 		}
 
-		logger.Infof("using existing chequebook %x", chequebookAddress)
+		logger.Infof("using existing chequebook %x balance %s", chequebookAddress, balance.String())
 	}
 
 	bonuskey.ChequebookAddr = chequebookAddress.String()

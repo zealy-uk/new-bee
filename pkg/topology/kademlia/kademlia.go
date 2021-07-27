@@ -621,7 +621,7 @@ func (k *Kad) connectBootNodes(ctx context.Context) {
 		}
 
 		if _, err := p2p.Discover(ctx, addr, func(addr ma.Multiaddr) (stop bool, err error) {
-			k.logger.Tracef("******connecting to bootnode %s", addr)
+			k.logger.Tracef("connecting to bootnode %s", addr)
 			if attempts >= maxBootNodeAttempts {
 				return true, nil
 			}
@@ -648,12 +648,9 @@ func (k *Kad) connectBootNodes(ctx context.Context) {
 			// connect to max 3 bootnodes
 			return connected >= 3, nil
 		}); err != nil && !errors.Is(err, context.Canceled) {
-			k.logger.Debugf("**********discover fail %s: %v", addr, err)
-			k.logger.Warningf("***********discover to bootnode %s", addr)
-			k.logger.Tracef("******discover bootnode %s, err:%v", addr, err)
+			k.logger.Debugf("discover fail %s: %v", addr, err)
+			k.logger.Warningf("discover to bootnode %s", addr)
 			return
-		} else {
-			k.logger.Tracef("******discover bootnode %s, err:%v", addr, err)
 		}
 
 	}
