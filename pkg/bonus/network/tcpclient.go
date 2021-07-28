@@ -85,7 +85,7 @@ reConnect:
 		if switchAddr {
 			addr, conn, err = dial()
 			if err != nil {
-				log.Error("failed to start new bonus connection", err)
+				log.Error("failed to start new bonus connection %v", err)
 				<-time.After(time.Second * 10)
 				continue
 			}
