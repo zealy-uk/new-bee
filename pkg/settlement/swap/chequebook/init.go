@@ -203,7 +203,7 @@ func Init(
 		}
 
 		if swapInitialDeposit.Cmp(balance) > 0 {
-			return nil, fmt.Errorf("chequebookAddr %s need balance %s, now got %s", chequebookAddress.String(), swapInitialDeposit.String(), balance.String())
+			return nil, fmt.Errorf("chequebook %s balance %s insufficient least deposit 100 fbzz", chequebookAddress.String(), balance.String())
 		}
 
 		chequebookService, err = New(transactionService, chequebookAddress, overlayEthAddress, stateStore, chequeSigner, erc20Service)
