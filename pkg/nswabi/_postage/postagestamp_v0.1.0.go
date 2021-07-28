@@ -1,4 +1,4 @@
-package nswabi
+package _postage
 
 const PostageStampABIv0_1_0 = `[
   {

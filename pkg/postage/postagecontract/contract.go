@@ -16,7 +16,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/newswarm-lab/new-bee/pkg/nswabi"
-	"github.com/newswarm-lab/new-bee/pkg/nswabi"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi/_postage"
 	"github.com/newswarm-lab/new-bee/pkg/postage"
 	"github.com/newswarm-lab/new-bee/pkg/sctx"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
@@ -25,7 +25,7 @@ import (
 var (
 	BucketDepth = uint8(16)
 
-	postageStampABI   = parseABI(nswabi.PostageStampABIv0_1_0)
+	postageStampABI   = parseABI(_postage.PostageStampABIv0_1_0)
 	erc20ABI          = parseABI(nswabi.ERC20ABIV0_1_0)
 	batchCreatedTopic = postageStampABI.Events["BatchCreated"].ID
 

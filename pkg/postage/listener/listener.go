@@ -18,8 +18,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/newswarm-lab/new-bee/pkg/nswabi"
 	"github.com/newswarm-lab/new-bee/pkg/logging"
+	"github.com/newswarm-lab/new-bee/pkg/nswabi/_postage"
 	"github.com/newswarm-lab/new-bee/pkg/postage"
 	"github.com/newswarm-lab/new-bee/pkg/transaction"
 	"github.com/prometheus/client_golang/prometheus"
@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	postageStampABI = parseABI(nswabi.PostageStampABIv0_1_0)
+	postageStampABI = parseABI(_postage.PostageStampABIv0_1_0)
 	// batchCreatedTopic is the postage contract's batch created event topic
 	batchCreatedTopic = postageStampABI.Events["BatchCreated"].ID
 	// batchTopupTopic is the postage contract's batch topup event topic
