@@ -314,6 +314,7 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 			chequebookFactory,
 			o.SwapInitialDeposit,
 			o.DeployGasPrice,
+			o.FullNodeMode,
 		)
 		if err != nil {
 			return nil, err
@@ -329,8 +330,10 @@ func NewBee(addr string, publicKey *ecdsa.PublicKey, signer crypto.Signer, netwo
 		)
 	}
 
-	bonusClient := bonus.InitBonus(logger)
-	b.bonusClientCloser = bonusClient
+	if o.FullNodeMode {
+		bonusClient := bonus.InitBonus(logger)
+		b.bonusClientCloser = bonusClient
+	}
 
 	pubKey, _ := signer.PublicKey()
 	if err != nil {

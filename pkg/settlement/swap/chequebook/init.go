@@ -104,6 +104,7 @@ func Init(
 	chainId int64,
 	overlayEthAddress common.Address,
 	chequeSigner ChequeSigner,
+	fullNodeMode bool,
 ) (chequebookService Service, err error) {
 	// verify that the supplied factory is valid
 	err = chequebookFactory.VerifyBytecode(ctx)
@@ -179,31 +180,31 @@ func Init(
 			return nil, err
 		}
 
-		/*
-			if swapInitialDeposit.Cmp(big.NewInt(0)) != 0 {
-				logger.Infof("depositing %d token into new chequebook", swapInitialDeposit)
-				depositHash, err := chequebookService.Deposit(ctx, swapInitialDeposit)
-				if err != nil {
-					return nil, err
-				}
+		if swapInitialDeposit.Cmp(big.NewInt(0)) != 0 {
+			logger.Infof("depositing %d token into new chequebook", swapInitialDeposit)
+			depositHash, err := chequebookService.Deposit(ctx, swapInitialDeposit)
+			if err != nil {
+				return nil, err
+			}
 
-				logger.Infof("sent deposit transaction %x", depositHash)
-				err = chequebookService.WaitForDeposit(ctx, depositHash)
-				if err != nil {
-					return nil, err
-				}
+			logger.Infof("sent deposit transaction %x", depositHash)
+			err = chequebookService.WaitForDeposit(ctx, depositHash)
+			if err != nil {
+				return nil, err
+			}
 
-				logger.Info("successfully deposited to chequebook")
-			}*/
+			logger.Info("successfully deposited to chequebook")
+		}
 	} else {
-		//todo check deposit
 		balance, err := erc20Service.BalanceOf(context.Background(), chequebookAddress)
 		if err != nil {
 			return nil, err
 		}
 
-		if swapInitialDeposit.Cmp(balance) > 0 {
-			return nil, fmt.Errorf("chequebook %s balance %s insufficient least deposit 100 fbzz", chequebookAddress.String(), balance.String())
+		if fullNodeMode {
+			if swapInitialDeposit.Cmp(balance) > 0 {
+				return nil, fmt.Errorf("%s deposit balance %s, less than 100000000000000000000", chequebookAddress.String(), balance.String())
+			}
 		}
 
 		chequebookService, err = New(transactionService, chequebookAddress, overlayEthAddress, stateStore, chequeSigner, erc20Service)

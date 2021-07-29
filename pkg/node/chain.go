@@ -136,6 +136,7 @@ func InitChequebookService(
 	chequebookFactory chequebook.Factory,
 	initialDeposit string,
 	deployGasPrice string,
+	fullNodeMode bool,
 ) (chequebook.Service, error) {
 	chequeSigner := chequebook.NewChequeSigner(signer, chainID)
 
@@ -158,8 +159,10 @@ func InitChequebookService(
 		return nil, fmt.Errorf("initial minDepositStr \"%s\" cannot be parsed", minDepositStr)
 	}
 
-	if lt := deposit.Cmp(minDeposit) < 0; lt {
-		return nil, fmt.Errorf("deposit %s too low, minimal value is 100000000000000000000", initialDeposit)
+	if fullNodeMode {
+		if lt := deposit.Cmp(minDeposit) < 0; lt {
+			return nil, fmt.Errorf("deposit %s too low, minimal value is 100000000000000000000", initialDeposit)
+		}
 	}
 
 	chequebookService, err := chequebook.Init(
@@ -173,6 +176,7 @@ func InitChequebookService(
 		chainID,
 		overlayEthAddress,
 		chequeSigner,
+		fullNodeMode,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("chequebook init: %w", err)
