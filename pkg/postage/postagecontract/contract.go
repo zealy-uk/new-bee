@@ -24,7 +24,7 @@ import (
 var (
 	BucketDepth = uint8(16)
 
-	postageStampABI   = parseABI(nswabi.StampABIv0_1_0)
+	postageStampABI   = parseABI(nswabi.PostageStampABIv0_1_0)
 	erc20ABI          = parseABI(nswabi.ERC20ABIV0_1_0)
 	batchCreatedTopic = postageStampABI.Events["BatchCreated"].ID
 

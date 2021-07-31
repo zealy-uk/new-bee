@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	postageStampABI = parseABI(nswabi.StampABIv0_1_0)
+	postageStampABI = parseABI(nswabi.PostageStampABIv0_1_0)
 	// batchCreatedTopic is the postage contract's batch created event topic
 	batchCreatedTopic = postageStampABI.Events["BatchCreated"].ID
 	// batchTopupTopic is the postage contract's batch topup event topic
